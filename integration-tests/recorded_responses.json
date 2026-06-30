@@ -1,0 +1,1325 @@
+[
+  {
+    "scenario": "ingest",
+    "request": {
+      "method": "POST",
+      "path": "/ingest",
+      "body": {
+        "github_url": "https://github.com/patrikja/autosar",
+        "branch": "master"
+      }
+    },
+    "response": {
+      "statusCode": 202,
+      "body": {
+        "repo_id": "patrikja__autosar__master",
+        "status": "PENDING"
+      }
+    }
+  },
+  {
+    "scenario": "status",
+    "request": {
+      "method": "GET",
+      "path": "/status?repo_id=patrikja__autosar__master",
+      "body": {}
+    },
+    "response": {
+      "statusCode": 200,
+      "body": {
+        "repo_id": "patrikja__autosar__master",
+        "status": "READY",
+        "meta": {
+          "github_url": "https://github.com/patrikja/autosar",
+          "branch": "master",
+          "location": "/tmp/sdv-itest-dywtbim6/out/patrikja__autosar__master/kb"
+        }
+      }
+    }
+  },
+  {
+    "scenario": "Q1 (blast-radius): If we remove the Door component, what breaks?",
+    "request": {
+      "method": "POST",
+      "path": "/analyze",
+      "body": {
+        "repo_id": "patrikja__autosar__master",
+        "change_request": "If we remove the Door component, what breaks?"
+      }
+    },
+    "response": {
+      "statusCode": 200,
+      "body": {
+        "change_request": "If we remove the Door component, what breaks?",
+        "target_nodes": [
+          {
+            "id": "/Demo/Door/Door",
+            "label": "Door",
+            "type": "APPLICATION-SW-COMPONENT-TYPE"
+          }
+        ],
+        "what_breaks": {
+          "summary": "2 component(s) and 4 signal chain(s) impacted by changing Door.",
+          "impacted": [
+            {
+              "id": "/Demo/DoorControl/DoorControl",
+              "type": "APPLICATION-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "high",
+              "domain": "body/doors",
+              "explanation": "DoorControl depends on Door; removing/changing it breaks this relationship."
+            },
+            {
+              "id": "/Demo/EDC/EDC",
+              "type": "COMPOSITION-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "high",
+              "domain": "body/doors",
+              "explanation": "EDC depends on Door; removing/changing it breaks this relationship."
+            },
+            {
+              "id": "CombinedStatusLockedLeftIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 1: CombinedStatusLockedLeft"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "Door feeds this chain; a cut severs CombinedStatusLockedLeftIPdu."
+            },
+            {
+              "id": "CombinedStatusOpenLeftIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 2: CombinedStatusOpenLeft"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "Door feeds this chain; a cut severs CombinedStatusOpenLeftIPdu."
+            },
+            {
+              "id": "CombinedStatusLockedRightIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 3: CombinedStatusLockedRight"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "Door feeds this chain; a cut severs CombinedStatusLockedRightIPdu."
+            },
+            {
+              "id": "CombinedStatusOpenRightIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 4: CombinedStatusOpenRight"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "Door feeds this chain; a cut severs CombinedStatusOpenRightIPdu."
+            }
+          ],
+          "graph": {
+            "nodes": [
+              {
+                "id": "/Demo/Door/Door"
+              },
+              {
+                "id": "/Demo/DoorControl/DoorControl"
+              },
+              {
+                "id": "/Demo/EDC/EDC"
+              }
+            ],
+            "edges": [
+              {
+                "from": "/Demo/DoorControl/DoorControl",
+                "to": "/Demo/Door/Door"
+              },
+              {
+                "from": "/Demo/EDC/EDC",
+                "to": "/Demo/Door/Door"
+              }
+            ]
+          }
+        },
+        "what_it_costs": {
+          "bom_saved": {
+            "low": 5.0,
+            "high": 25.0,
+            "currency": "USD",
+            "unit": null,
+            "basis": "per-vehicle"
+          },
+          "eng_rework": {
+            "low": 40.0,
+            "high": 240.0,
+            "currency": null,
+            "unit": "engineer-hours",
+            "basis": null
+          },
+          "net_assessment": "neutral",
+          "line_items": [
+            {
+              "label": "Rework DoorControl",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            },
+            {
+              "label": "Rework EDC",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            }
+          ]
+        },
+        "what_it_risks": {
+          "items": [
+            {
+              "category": "network",
+              "severity": "high",
+              "title": "Network signal source affected",
+              "detail": "4 signal chain(s) lose their source if Door changes.",
+              "revalidation_required": true
+            },
+            {
+              "category": "integration",
+              "severity": "high",
+              "title": "Downstream components require rework",
+              "detail": "DoorControl, EDC component(s) depend on Door.",
+              "revalidation_required": true
+            }
+          ]
+        },
+        "confidence": {
+          "level": "medium",
+          "model_agreement": null
+        }
+      }
+    }
+  },
+  {
+    "scenario": "Q2 (blast-radius): What is the impact of removing the DoorControl component?",
+    "request": {
+      "method": "POST",
+      "path": "/analyze",
+      "body": {
+        "repo_id": "patrikja__autosar__master",
+        "change_request": "What is the impact of removing the DoorControl component?"
+      }
+    },
+    "response": {
+      "statusCode": 200,
+      "body": {
+        "change_request": "What is the impact of removing the DoorControl component?",
+        "target_nodes": [
+          {
+            "id": "/Demo/DoorControl/DoorControl",
+            "label": "DoorControl",
+            "type": "APPLICATION-SW-COMPONENT-TYPE"
+          }
+        ],
+        "what_breaks": {
+          "summary": "1 component(s) and 4 signal chain(s) impacted by changing DoorControl.",
+          "impacted": [
+            {
+              "id": "/Demo/EDC/EDC",
+              "type": "COMPOSITION-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "medium",
+              "domain": "body/doors",
+              "explanation": "EDC depends on DoorControl; removing/changing it breaks this relationship."
+            },
+            {
+              "id": "CombinedStatusLockedLeftIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 1: CombinedStatusLockedLeft"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "DoorControl feeds this chain; a cut severs CombinedStatusLockedLeftIPdu."
+            },
+            {
+              "id": "CombinedStatusOpenLeftIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 2: CombinedStatusOpenLeft"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "DoorControl feeds this chain; a cut severs CombinedStatusOpenLeftIPdu."
+            },
+            {
+              "id": "CombinedStatusLockedRightIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 3: CombinedStatusLockedRight"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "DoorControl feeds this chain; a cut severs CombinedStatusLockedRightIPdu."
+            },
+            {
+              "id": "CombinedStatusOpenRightIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 4: CombinedStatusOpenRight"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "DoorControl feeds this chain; a cut severs CombinedStatusOpenRightIPdu."
+            }
+          ],
+          "graph": {
+            "nodes": [
+              {
+                "id": "/Demo/DoorControl/DoorControl"
+              },
+              {
+                "id": "/Demo/EDC/EDC"
+              }
+            ],
+            "edges": [
+              {
+                "from": "/Demo/EDC/EDC",
+                "to": "/Demo/DoorControl/DoorControl"
+              }
+            ]
+          }
+        },
+        "what_it_costs": {
+          "bom_saved": {
+            "low": 5.0,
+            "high": 25.0,
+            "currency": "USD",
+            "unit": null,
+            "basis": "per-vehicle"
+          },
+          "eng_rework": {
+            "low": 40.0,
+            "high": 200.0,
+            "currency": null,
+            "unit": "engineer-hours",
+            "basis": null
+          },
+          "net_assessment": "neutral",
+          "line_items": [
+            {
+              "label": "Rework EDC",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            }
+          ]
+        },
+        "what_it_risks": {
+          "items": [
+            {
+              "category": "network",
+              "severity": "high",
+              "title": "Network signal source affected",
+              "detail": "4 signal chain(s) lose their source if DoorControl changes.",
+              "revalidation_required": true
+            },
+            {
+              "category": "integration",
+              "severity": "medium",
+              "title": "Downstream components require rework",
+              "detail": "EDC component(s) depend on DoorControl.",
+              "revalidation_required": true
+            }
+          ]
+        },
+        "confidence": {
+          "level": "medium",
+          "model_agreement": null
+        }
+      }
+    }
+  },
+  {
+    "scenario": "Q3 (blast-radius): What is the impact of removing the IoHwAb service component?",
+    "request": {
+      "method": "POST",
+      "path": "/analyze",
+      "body": {
+        "repo_id": "patrikja__autosar__master",
+        "change_request": "What is the impact of removing the IoHwAb service component?"
+      }
+    },
+    "response": {
+      "statusCode": 200,
+      "body": {
+        "change_request": "What is the impact of removing the IoHwAb service component?",
+        "target_nodes": [
+          {
+            "id": "/Demo/Services/IoHwAb/IoHwAb",
+            "label": "IoHwAb",
+            "type": "SERVICE-SW-COMPONENT-TYPE"
+          }
+        ],
+        "what_breaks": {
+          "summary": "2 component(s) and 0 signal chain(s) impacted by changing IoHwAb.",
+          "impacted": [
+            {
+              "id": "/Demo/DoorControl/DoorControl",
+              "type": "APPLICATION-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "high",
+              "domain": "body/doors",
+              "explanation": "DoorControl depends on IoHwAb; removing/changing it breaks this relationship."
+            },
+            {
+              "id": "/Demo/EDC/EDC",
+              "type": "COMPOSITION-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "high",
+              "domain": "body/doors",
+              "explanation": "EDC depends on IoHwAb; removing/changing it breaks this relationship."
+            }
+          ],
+          "graph": {
+            "nodes": [
+              {
+                "id": "/Demo/Services/IoHwAb/IoHwAb"
+              },
+              {
+                "id": "/Demo/DoorControl/DoorControl"
+              },
+              {
+                "id": "/Demo/EDC/EDC"
+              }
+            ],
+            "edges": [
+              {
+                "from": "/Demo/DoorControl/DoorControl",
+                "to": "/Demo/Services/IoHwAb/IoHwAb"
+              },
+              {
+                "from": "/Demo/EDC/EDC",
+                "to": "/Demo/Services/IoHwAb/IoHwAb"
+              }
+            ]
+          }
+        },
+        "what_it_costs": {
+          "bom_saved": {
+            "low": 5.0,
+            "high": 25.0,
+            "currency": "USD",
+            "unit": null,
+            "basis": "per-vehicle"
+          },
+          "eng_rework": {
+            "low": 40.0,
+            "high": 160.0,
+            "currency": null,
+            "unit": "engineer-hours",
+            "basis": null
+          },
+          "net_assessment": "neutral",
+          "line_items": [
+            {
+              "label": "Rework DoorControl",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            },
+            {
+              "label": "Rework EDC",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            }
+          ]
+        },
+        "what_it_risks": {
+          "items": [
+            {
+              "category": "network",
+              "severity": "high",
+              "title": "Network signal source affected",
+              "detail": "0 signal chain(s) lose their source if IoHwAb changes.",
+              "revalidation_required": true
+            },
+            {
+              "category": "integration",
+              "severity": "high",
+              "title": "Downstream components require rework",
+              "detail": "DoorControl, EDC component(s) depend on IoHwAb.",
+              "revalidation_required": true
+            }
+          ]
+        },
+        "confidence": {
+          "level": "medium",
+          "model_agreement": null
+        }
+      }
+    }
+  },
+  {
+    "scenario": "Q4 (blast-radius): What breaks if we remove the EDC composition?",
+    "request": {
+      "method": "POST",
+      "path": "/analyze",
+      "body": {
+        "repo_id": "patrikja__autosar__master",
+        "change_request": "What breaks if we remove the EDC composition?"
+      }
+    },
+    "response": {
+      "statusCode": 200,
+      "body": {
+        "change_request": "What breaks if we remove the EDC composition?",
+        "target_nodes": [
+          {
+            "id": "/Demo/EDC/EDC",
+            "label": "EDC",
+            "type": "COMPOSITION-SW-COMPONENT-TYPE"
+          }
+        ],
+        "what_breaks": {
+          "summary": "0 component(s) and 0 signal chain(s) impacted by changing EDC.",
+          "impacted": [],
+          "graph": {
+            "nodes": [
+              {
+                "id": "/Demo/EDC/EDC"
+              }
+            ],
+            "edges": []
+          }
+        },
+        "what_it_costs": {
+          "bom_saved": {
+            "low": 5.0,
+            "high": 25.0,
+            "currency": "USD",
+            "unit": null,
+            "basis": "per-vehicle"
+          },
+          "eng_rework": {
+            "low": 40.0,
+            "high": 80.0,
+            "currency": null,
+            "unit": "engineer-hours",
+            "basis": null
+          },
+          "net_assessment": "favorable",
+          "line_items": []
+        },
+        "what_it_risks": {
+          "items": [
+            {
+              "category": "integration",
+              "severity": "medium",
+              "title": "Downstream components require rework",
+              "detail": "No component(s) depend on EDC.",
+              "revalidation_required": false
+            }
+          ]
+        },
+        "confidence": {
+          "level": "medium",
+          "model_agreement": null
+        }
+      }
+    }
+  },
+  {
+    "scenario": "Q5 (dependency): What is affected if we change the DoorStatus interface?",
+    "request": {
+      "method": "POST",
+      "path": "/analyze",
+      "body": {
+        "repo_id": "patrikja__autosar__master",
+        "change_request": "What is affected if we change the DoorStatus interface?"
+      }
+    },
+    "response": {
+      "statusCode": 200,
+      "body": {
+        "change_request": "What is affected if we change the DoorStatus interface?",
+        "target_nodes": [
+          {
+            "id": "/Demo/Interfaces/DoorStatus",
+            "label": "DoorStatus",
+            "type": "SENDER-RECEIVER-INTERFACE"
+          }
+        ],
+        "what_breaks": {
+          "summary": "2 component(s) and 0 signal chain(s) impacted by changing DoorStatus.",
+          "impacted": [
+            {
+              "id": "/Demo/Door/Door",
+              "type": "APPLICATION-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "high",
+              "domain": "body/doors",
+              "explanation": "Door depends on DoorStatus; removing/changing it breaks this relationship."
+            },
+            {
+              "id": "/Demo/DoorControl/DoorControl",
+              "type": "APPLICATION-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "high",
+              "domain": "body/doors",
+              "explanation": "DoorControl depends on DoorStatus; removing/changing it breaks this relationship."
+            }
+          ],
+          "graph": {
+            "nodes": [
+              {
+                "id": "/Demo/Interfaces/DoorStatus"
+              },
+              {
+                "id": "/Demo/Door/Door"
+              },
+              {
+                "id": "/Demo/DoorControl/DoorControl"
+              }
+            ],
+            "edges": [
+              {
+                "from": "/Demo/Door/Door",
+                "to": "/Demo/Interfaces/DoorStatus"
+              },
+              {
+                "from": "/Demo/DoorControl/DoorControl",
+                "to": "/Demo/Interfaces/DoorStatus"
+              }
+            ]
+          }
+        },
+        "what_it_costs": {
+          "bom_saved": {
+            "low": 5.0,
+            "high": 25.0,
+            "currency": "USD",
+            "unit": null,
+            "basis": "per-vehicle"
+          },
+          "eng_rework": {
+            "low": 40.0,
+            "high": 160.0,
+            "currency": null,
+            "unit": "engineer-hours",
+            "basis": null
+          },
+          "net_assessment": "neutral",
+          "line_items": [
+            {
+              "label": "Rework Door",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            },
+            {
+              "label": "Rework DoorControl",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            }
+          ]
+        },
+        "what_it_risks": {
+          "items": [
+            {
+              "category": "integration",
+              "severity": "high",
+              "title": "Downstream components require rework",
+              "detail": "Door, DoorControl component(s) depend on DoorStatus.",
+              "revalidation_required": true
+            }
+          ]
+        },
+        "confidence": {
+          "level": "medium",
+          "model_agreement": null
+        }
+      }
+    }
+  },
+  {
+    "scenario": "Q6 (dependency): What is affected if we change the DoorCommands interface?",
+    "request": {
+      "method": "POST",
+      "path": "/analyze",
+      "body": {
+        "repo_id": "patrikja__autosar__master",
+        "change_request": "What is affected if we change the DoorCommands interface?"
+      }
+    },
+    "response": {
+      "statusCode": 200,
+      "body": {
+        "change_request": "What is affected if we change the DoorCommands interface?",
+        "target_nodes": [
+          {
+            "id": "/Demo/Interfaces/DoorCommands",
+            "label": "DoorCommands",
+            "type": "CLIENT-SERVER-INTERFACE"
+          }
+        ],
+        "what_breaks": {
+          "summary": "2 component(s) and 0 signal chain(s) impacted by changing DoorCommands.",
+          "impacted": [
+            {
+              "id": "/Demo/Door/Door",
+              "type": "APPLICATION-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "high",
+              "domain": "body/doors",
+              "explanation": "Door depends on DoorCommands; removing/changing it breaks this relationship."
+            },
+            {
+              "id": "/Demo/DoorControl/DoorControl",
+              "type": "APPLICATION-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "high",
+              "domain": "body/doors",
+              "explanation": "DoorControl depends on DoorCommands; removing/changing it breaks this relationship."
+            }
+          ],
+          "graph": {
+            "nodes": [
+              {
+                "id": "/Demo/Interfaces/DoorCommands"
+              },
+              {
+                "id": "/Demo/Door/Door"
+              },
+              {
+                "id": "/Demo/DoorControl/DoorControl"
+              }
+            ],
+            "edges": [
+              {
+                "from": "/Demo/Door/Door",
+                "to": "/Demo/Interfaces/DoorCommands"
+              },
+              {
+                "from": "/Demo/DoorControl/DoorControl",
+                "to": "/Demo/Interfaces/DoorCommands"
+              }
+            ]
+          }
+        },
+        "what_it_costs": {
+          "bom_saved": {
+            "low": 5.0,
+            "high": 25.0,
+            "currency": "USD",
+            "unit": null,
+            "basis": "per-vehicle"
+          },
+          "eng_rework": {
+            "low": 40.0,
+            "high": 160.0,
+            "currency": null,
+            "unit": "engineer-hours",
+            "basis": null
+          },
+          "net_assessment": "neutral",
+          "line_items": [
+            {
+              "label": "Rework Door",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            },
+            {
+              "label": "Rework DoorControl",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            }
+          ]
+        },
+        "what_it_risks": {
+          "items": [
+            {
+              "category": "integration",
+              "severity": "high",
+              "title": "Downstream components require rework",
+              "detail": "Door, DoorControl component(s) depend on DoorCommands.",
+              "revalidation_required": true
+            }
+          ]
+        },
+        "confidence": {
+          "level": "medium",
+          "model_agreement": null
+        }
+      }
+    }
+  },
+  {
+    "scenario": "Q7 (signal-flow): What breaks if we modify the CombinedStatus interface?",
+    "request": {
+      "method": "POST",
+      "path": "/analyze",
+      "body": {
+        "repo_id": "patrikja__autosar__master",
+        "change_request": "What breaks if we modify the CombinedStatus interface?"
+      }
+    },
+    "response": {
+      "statusCode": 200,
+      "body": {
+        "change_request": "What breaks if we modify the CombinedStatus interface?",
+        "target_nodes": [
+          {
+            "id": "/Demo/Interfaces/CombinedStatus",
+            "label": "CombinedStatus",
+            "type": "SENDER-RECEIVER-INTERFACE"
+          }
+        ],
+        "what_breaks": {
+          "summary": "2 component(s) and 4 signal chain(s) impacted by changing CombinedStatus.",
+          "impacted": [
+            {
+              "id": "/Demo/DoorControl/DoorControl",
+              "type": "APPLICATION-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "high",
+              "domain": "body/doors",
+              "explanation": "DoorControl depends on CombinedStatus; removing/changing it breaks this relationship."
+            },
+            {
+              "id": "/Demo/EDC/EDC",
+              "type": "COMPOSITION-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "high",
+              "domain": "body/doors",
+              "explanation": "EDC depends on CombinedStatus; removing/changing it breaks this relationship."
+            },
+            {
+              "id": "CombinedStatusLockedLeftIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 1: CombinedStatusLockedLeft"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "CombinedStatus feeds this chain; a cut severs CombinedStatusLockedLeftIPdu."
+            },
+            {
+              "id": "CombinedStatusOpenLeftIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 2: CombinedStatusOpenLeft"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "CombinedStatus feeds this chain; a cut severs CombinedStatusOpenLeftIPdu."
+            },
+            {
+              "id": "CombinedStatusLockedRightIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 3: CombinedStatusLockedRight"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "CombinedStatus feeds this chain; a cut severs CombinedStatusLockedRightIPdu."
+            },
+            {
+              "id": "CombinedStatusOpenRightIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 4: CombinedStatusOpenRight"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "CombinedStatus feeds this chain; a cut severs CombinedStatusOpenRightIPdu."
+            }
+          ],
+          "graph": {
+            "nodes": [
+              {
+                "id": "/Demo/Interfaces/CombinedStatus"
+              },
+              {
+                "id": "/Demo/DoorControl/DoorControl"
+              },
+              {
+                "id": "/Demo/EDC/EDC"
+              }
+            ],
+            "edges": [
+              {
+                "from": "/Demo/DoorControl/DoorControl",
+                "to": "/Demo/Interfaces/CombinedStatus"
+              },
+              {
+                "from": "/Demo/EDC/EDC",
+                "to": "/Demo/Interfaces/CombinedStatus"
+              }
+            ]
+          }
+        },
+        "what_it_costs": {
+          "bom_saved": {
+            "low": 5.0,
+            "high": 25.0,
+            "currency": "USD",
+            "unit": null,
+            "basis": "per-vehicle"
+          },
+          "eng_rework": {
+            "low": 40.0,
+            "high": 240.0,
+            "currency": null,
+            "unit": "engineer-hours",
+            "basis": null
+          },
+          "net_assessment": "neutral",
+          "line_items": [
+            {
+              "label": "Rework DoorControl",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            },
+            {
+              "label": "Rework EDC",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            }
+          ]
+        },
+        "what_it_risks": {
+          "items": [
+            {
+              "category": "network",
+              "severity": "high",
+              "title": "Network signal source affected",
+              "detail": "4 signal chain(s) lose their source if CombinedStatus changes.",
+              "revalidation_required": true
+            },
+            {
+              "category": "integration",
+              "severity": "high",
+              "title": "Downstream components require rework",
+              "detail": "DoorControl, EDC component(s) depend on CombinedStatus.",
+              "revalidation_required": true
+            }
+          ]
+        },
+        "confidence": {
+          "level": "medium",
+          "model_agreement": null
+        }
+      }
+    }
+  },
+  {
+    "scenario": "Q8 (dependency): What is the impact of removing the DigitalServiceWrite interface?",
+    "request": {
+      "method": "POST",
+      "path": "/analyze",
+      "body": {
+        "repo_id": "patrikja__autosar__master",
+        "change_request": "What is the impact of removing the DigitalServiceWrite interface?"
+      }
+    },
+    "response": {
+      "statusCode": 200,
+      "body": {
+        "change_request": "What is the impact of removing the DigitalServiceWrite interface?",
+        "target_nodes": [
+          {
+            "id": "/Demo/Services/IoHwAb/DigitalServiceWrite",
+            "label": "DigitalServiceWrite",
+            "type": "CLIENT-SERVER-INTERFACE"
+          }
+        ],
+        "what_breaks": {
+          "summary": "2 component(s) and 0 signal chain(s) impacted by changing DigitalServiceWrite.",
+          "impacted": [
+            {
+              "id": "/Demo/Services/IoHwAb/IoHwAb",
+              "type": "SERVICE-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "high",
+              "domain": "body/doors",
+              "explanation": "IoHwAb depends on DigitalServiceWrite; removing/changing it breaks this relationship."
+            },
+            {
+              "id": "/Demo/DoorControl/DoorControl",
+              "type": "APPLICATION-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "high",
+              "domain": "body/doors",
+              "explanation": "DoorControl depends on DigitalServiceWrite; removing/changing it breaks this relationship."
+            }
+          ],
+          "graph": {
+            "nodes": [
+              {
+                "id": "/Demo/Services/IoHwAb/DigitalServiceWrite"
+              },
+              {
+                "id": "/Demo/Services/IoHwAb/IoHwAb"
+              },
+              {
+                "id": "/Demo/DoorControl/DoorControl"
+              }
+            ],
+            "edges": [
+              {
+                "from": "/Demo/Services/IoHwAb/IoHwAb",
+                "to": "/Demo/Services/IoHwAb/DigitalServiceWrite"
+              },
+              {
+                "from": "/Demo/DoorControl/DoorControl",
+                "to": "/Demo/Services/IoHwAb/DigitalServiceWrite"
+              }
+            ]
+          }
+        },
+        "what_it_costs": {
+          "bom_saved": {
+            "low": 5.0,
+            "high": 25.0,
+            "currency": "USD",
+            "unit": null,
+            "basis": "per-vehicle"
+          },
+          "eng_rework": {
+            "low": 40.0,
+            "high": 160.0,
+            "currency": null,
+            "unit": "engineer-hours",
+            "basis": null
+          },
+          "net_assessment": "neutral",
+          "line_items": [
+            {
+              "label": "Rework IoHwAb",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            },
+            {
+              "label": "Rework DoorControl",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            }
+          ]
+        },
+        "what_it_risks": {
+          "items": [
+            {
+              "category": "integration",
+              "severity": "high",
+              "title": "Downstream components require rework",
+              "detail": "IoHwAb, DoorControl component(s) depend on DigitalServiceWrite.",
+              "revalidation_required": true
+            }
+          ]
+        },
+        "confidence": {
+          "level": "medium",
+          "model_agreement": null
+        }
+      }
+    }
+  },
+  {
+    "scenario": "Q9 (de-content): De-content the right door: what becomes obsolete if we remove the DoorRight instance?",
+    "request": {
+      "method": "POST",
+      "path": "/analyze",
+      "body": {
+        "repo_id": "patrikja__autosar__master",
+        "change_request": "De-content the right door: what becomes obsolete if we remove the DoorRight instance?"
+      }
+    },
+    "response": {
+      "statusCode": 200,
+      "body": {
+        "change_request": "De-content the right door: what becomes obsolete if we remove the DoorRight instance?",
+        "target_nodes": [
+          {
+            "id": "/Demo/EDC/EDC/DoorRight",
+            "label": "DoorRight",
+            "type": "SW-COMPONENT-PROTOTYPE"
+          }
+        ],
+        "what_breaks": {
+          "summary": "0 component(s) and 0 signal chain(s) impacted by changing DoorRight.",
+          "impacted": [],
+          "graph": {
+            "nodes": [
+              {
+                "id": "/Demo/EDC/EDC/DoorRight"
+              }
+            ],
+            "edges": []
+          }
+        },
+        "what_it_costs": {
+          "bom_saved": {
+            "low": 5.0,
+            "high": 25.0,
+            "currency": "USD",
+            "unit": null,
+            "basis": "per-vehicle"
+          },
+          "eng_rework": {
+            "low": 40.0,
+            "high": 80.0,
+            "currency": null,
+            "unit": "engineer-hours",
+            "basis": null
+          },
+          "net_assessment": "favorable",
+          "line_items": []
+        },
+        "what_it_risks": {
+          "items": [
+            {
+              "category": "integration",
+              "severity": "medium",
+              "title": "Downstream components require rework",
+              "detail": "No component(s) depend on DoorRight.",
+              "revalidation_required": false
+            }
+          ]
+        },
+        "confidence": {
+          "level": "medium",
+          "model_agreement": null
+        }
+      }
+    }
+  },
+  {
+    "scenario": "Q10 (signal-flow): What is the network/bus impact of removing the Door component?",
+    "request": {
+      "method": "POST",
+      "path": "/analyze",
+      "body": {
+        "repo_id": "patrikja__autosar__master",
+        "change_request": "What is the network/bus impact of removing the Door component?"
+      }
+    },
+    "response": {
+      "statusCode": 200,
+      "body": {
+        "change_request": "What is the network/bus impact of removing the Door component?",
+        "target_nodes": [
+          {
+            "id": "/Demo/Door/Door",
+            "label": "Door",
+            "type": "APPLICATION-SW-COMPONENT-TYPE"
+          }
+        ],
+        "what_breaks": {
+          "summary": "2 component(s) and 4 signal chain(s) impacted by changing Door.",
+          "impacted": [
+            {
+              "id": "/Demo/DoorControl/DoorControl",
+              "type": "APPLICATION-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "high",
+              "domain": "body/doors",
+              "explanation": "DoorControl depends on Door; removing/changing it breaks this relationship."
+            },
+            {
+              "id": "/Demo/EDC/EDC",
+              "type": "COMPOSITION-SW-COMPONENT-TYPE",
+              "hops": 1,
+              "via": [
+                "assembly/containment"
+              ],
+              "severity": "high",
+              "domain": "body/doors",
+              "explanation": "EDC depends on Door; removing/changing it breaks this relationship."
+            },
+            {
+              "id": "CombinedStatusLockedLeftIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 1: CombinedStatusLockedLeft"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "Door feeds this chain; a cut severs CombinedStatusLockedLeftIPdu."
+            },
+            {
+              "id": "CombinedStatusOpenLeftIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 2: CombinedStatusOpenLeft"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "Door feeds this chain; a cut severs CombinedStatusOpenLeftIPdu."
+            },
+            {
+              "id": "CombinedStatusLockedRightIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 3: CombinedStatusLockedRight"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "Door feeds this chain; a cut severs CombinedStatusLockedRightIPdu."
+            },
+            {
+              "id": "CombinedStatusOpenRightIPdu",
+              "type": "I-SIGNAL-I-PDU",
+              "hops": 2,
+              "via": [
+                "Chain 4: CombinedStatusOpenRight"
+              ],
+              "severity": "high",
+              "domain": "network",
+              "explanation": "Door feeds this chain; a cut severs CombinedStatusOpenRightIPdu."
+            }
+          ],
+          "graph": {
+            "nodes": [
+              {
+                "id": "/Demo/Door/Door"
+              },
+              {
+                "id": "/Demo/DoorControl/DoorControl"
+              },
+              {
+                "id": "/Demo/EDC/EDC"
+              }
+            ],
+            "edges": [
+              {
+                "from": "/Demo/DoorControl/DoorControl",
+                "to": "/Demo/Door/Door"
+              },
+              {
+                "from": "/Demo/EDC/EDC",
+                "to": "/Demo/Door/Door"
+              }
+            ]
+          }
+        },
+        "what_it_costs": {
+          "bom_saved": {
+            "low": 5.0,
+            "high": 25.0,
+            "currency": "USD",
+            "unit": null,
+            "basis": "per-vehicle"
+          },
+          "eng_rework": {
+            "low": 40.0,
+            "high": 240.0,
+            "currency": null,
+            "unit": "engineer-hours",
+            "basis": null
+          },
+          "net_assessment": "neutral",
+          "line_items": [
+            {
+              "label": "Rework DoorControl",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            },
+            {
+              "label": "Rework EDC",
+              "low": 20.0,
+              "high": 60.0,
+              "unit": "hours"
+            }
+          ]
+        },
+        "what_it_risks": {
+          "items": [
+            {
+              "category": "network",
+              "severity": "high",
+              "title": "Network signal source affected",
+              "detail": "4 signal chain(s) lose their source if Door changes.",
+              "revalidation_required": true
+            },
+            {
+              "category": "integration",
+              "severity": "high",
+              "title": "Downstream components require rework",
+              "detail": "DoorControl, EDC component(s) depend on Door.",
+              "revalidation_required": true
+            }
+          ]
+        },
+        "confidence": {
+          "level": "medium",
+          "model_agreement": null
+        }
+      }
+    }
+  }
+]

@@ -49,7 +49,9 @@ def _matches(ref: str, path: str) -> int:
         return 80
     # token overlap on the last segment (handles "rear-door" ~ "Door").
     tokens = [t for t in ref_l.replace("-", " ").replace("_", " ").split() if t]
-    if any(t in name or name in t for t in tokens):
+    if name in tokens:
+        return 80
+    if any(t in name for t in tokens):
         return 50
     if ref_l in path_l:
         return 30

@@ -22,9 +22,21 @@ from .tools import record_status_impl
 from . import workspace
 
 
+# CORS `*` (parent §4.2) so the SPA can call the API directly. API Gateway also
+# sets these; emitting them here keeps responses correct on any adapter path.
+_CORS = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "content-type",
+    "Access-Control-Allow-Methods": "POST,GET,OPTIONS",
+}
+
+
 def handler(event: dict, context: Any = None) -> dict:
     if event.get("mode") == "worker":
         return _worker(event)
+    if _method(event) == "OPTIONS":
+        return _resp(204, {})
     return _api(event)
 
 
@@ -124,6 +136,6 @@ def _body(event: dict) -> dict:
 def _resp(status: int, body: dict) -> dict:
     return {
         "statusCode": status,
-        "headers": {"Content-Type": "application/json"},
+        "headers": _CORS,
         "body": json.dumps(body),
     }
