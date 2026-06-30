@@ -201,7 +201,7 @@ semantics and lets later steps re-read earlier `_index/` files in the same run:
 3. On finalize, `/tmp/<repo_id>/kb/` is uploaded to `s3://$KB_BUCKET/<repo_id>/kb/` in one pass.
 4. `/tmp` is cleared at the end of the invocation.
 
-`repo_id` is a human-readable slug from the GitHub URL + branch (e.g. `patrikja__autosar__main`) —
+`repo_id` is a human-readable slug from the GitHub URL + branch (e.g. `patrikja__autosar__master`) —
 visible in the S3 console and idempotent on re-ingest.
 
 ### 9.5 Shared Core & Entry Points

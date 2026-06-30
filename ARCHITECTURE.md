@@ -92,8 +92,9 @@ Each component below has a detailed software-unit architecture document under `c
   server (nginx, or `vite preview`/a static file server) **running on the same EC2 VM**.
   The app is reachable directly at the VM's **public DNS name** (`http://<ec2-public-dns>/`).
 - **Auth:** N/A.
-- **Config:** the API base URL is injected at build time (env var) or served from a
-  small `config.json`; pointing the SPA at the API Gateway URL is the only wiring needed.
+- **Config:** the API base URL is read at **runtime** from a small `config.json` (the
+  deployed source of truth; an optional build-time `VITE_API_BASE_URL` override exists for
+  local dev); pointing the SPA at the API Gateway URL is the only wiring needed.
 - **Screens:**
   - *Onboarding* — paste a GitHub URL, trigger ingestion, watch status.
   - *Chat + Dashboard* — enter change requests; render the result JSON as impact cards:
@@ -103,9 +104,14 @@ Each component below has a detailed software-unit architecture document under `c
 ### 4.2 API Layer
 - **Amazon API Gateway (HTTP API)** — single API for both ingestion and chat.
 - **No authorizer — all routes are open.**
-- **CORS** is enabled for the VM's public DNS origin so the SPA can call the API directly.
-- Long-running analysis uses a **Lambda Function URL with response streaming** (or
-  request/response with a loading state) — no WebSocket connection management.
+- **CORS `*`** (wildcard) so the SPA can call the API directly; using `*` also breaks the
+  EC2↔API circular dependency (the API need not be told the VM's public-DNS origin).
+- **Ingestion is asynchronous:** `POST /ingest` returns `202 { repo_id }` immediately and the
+  Ingest Lambda **async self-invokes** a worker (beating the API Gateway 30 s limit); the
+  frontend polls `GET /status` until `READY`/`FAILED`.
+- **Analysis is synchronous:** `POST /analyze` returns the result within the 30 s window. A
+  **Lambda Function URL with response streaming** is a documented fallback if a request nears
+  the limit — no WebSocket connection management.
 
 ### 4.3 Ingestion Agent (Markdown KB builder)
 A **Strands agent** running in-process inside the Ingest Lambda, triggered by the
@@ -245,15 +251,15 @@ Unresolved references are tagged `(UNRESOLVED)` inline and listed in `_index/sta
 ### 6.1 Ingestion
 ```
 User submits GitHub URL
-   → API Gateway (open) → Ingest Lambda (Strands agent + skill)
-       → download_repo (tarball)
-       → list_arxml / read_arxml / parse_element (deterministic)
+   → API Gateway (open) → Ingest Lambda (api): validate, write PENDING, async self-invoke → 202 { repo_id }
+   → Ingest Lambda (worker, Strands agent + skill)
+       → scan_repo (tarball fetch + extract + parse, deterministic)
        → build _index/ (path-index, components, interfaces, port-map)
        → resolve relationship graph (dependency-graph, composition-tree)
        → trace signal-chains
        → write_kb_file ×N → Markdown KB tree → S3 (repo prefix)
-       → record_status (metadata/status) → DynamoDB
-   → frontend polls status until READY
+       → record_status (READY/FAILED) → DynamoDB
+   → frontend polls GET /status until READY
 ```
 
 ### 6.2 Analysis
