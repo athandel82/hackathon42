@@ -1,0 +1,86 @@
+# Path Index
+
+Resolve any AUTOSAR path to its KB file, type, and source location. Sub-element
+paths (data elements, operations) resolve to their owning interface file.
+
+| AUTOSAR Path | Type | File | Source Ref |
+|--------------|------|------|------------|
+| /ArcCore/Platform/BaseTypes/boolean | SW-BASE-TYPE | [platform/BaseTypes.md](../platform/BaseTypes.md) | ArcCore_Types.arxml:14 |
+| /ArcCore/Platform/BaseTypes/float32 | SW-BASE-TYPE | [platform/BaseTypes.md](../platform/BaseTypes.md) | ArcCore_Types.arxml:84 |
+| /ArcCore/Platform/BaseTypes/float64 | SW-BASE-TYPE | [platform/BaseTypes.md](../platform/BaseTypes.md) | ArcCore_Types.arxml:94 |
+| /ArcCore/Platform/BaseTypes/sint16 | SW-BASE-TYPE | [platform/BaseTypes.md](../platform/BaseTypes.md) | ArcCore_Types.arxml:64 |
+| /ArcCore/Platform/BaseTypes/sint32 | SW-BASE-TYPE | [platform/BaseTypes.md](../platform/BaseTypes.md) | ArcCore_Types.arxml:74 |
+| /ArcCore/Platform/BaseTypes/sint8 | SW-BASE-TYPE | [platform/BaseTypes.md](../platform/BaseTypes.md) | ArcCore_Types.arxml:54 |
+| /ArcCore/Platform/BaseTypes/uint16 | SW-BASE-TYPE | [platform/BaseTypes.md](../platform/BaseTypes.md) | ArcCore_Types.arxml:34 |
+| /ArcCore/Platform/BaseTypes/uint32 | SW-BASE-TYPE | [platform/BaseTypes.md](../platform/BaseTypes.md) | ArcCore_Types.arxml:44 |
+| /ArcCore/Platform/BaseTypes/uint8 | SW-BASE-TYPE | [platform/BaseTypes.md](../platform/BaseTypes.md) | ArcCore_Types.arxml:24 |
+| /ArcCore/Platform/BaseTypes/void | SW-BASE-TYPE | [platform/BaseTypes.md](../platform/BaseTypes.md) | ArcCore_Types.arxml:104 |
+| /ArcCore/Platform/CompuMethods/boolean | COMPU-METHOD | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | ArcCore_Types.arxml:301 |
+| /ArcCore/Platform/ImplementationDataTypes/ConstVoidPtr | IMPLEMENTATION-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | ArcCore_Types.arxml:254 |
+| /ArcCore/Platform/ImplementationDataTypes/VoidPtr | IMPLEMENTATION-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | ArcCore_Types.arxml:275 |
+| /ArcCore/Platform/ImplementationDataTypes/boolean | IMPLEMENTATION-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | ArcCore_Types.arxml:118 |
+| /ArcCore/Platform/ImplementationDataTypes/float32 | IMPLEMENTATION-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | ArcCore_Types.arxml:224 |
+| /ArcCore/Platform/ImplementationDataTypes/float64 | IMPLEMENTATION-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | ArcCore_Types.arxml:239 |
+| /ArcCore/Platform/ImplementationDataTypes/sint16 | IMPLEMENTATION-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | ArcCore_Types.arxml:194 |
+| /ArcCore/Platform/ImplementationDataTypes/sint32 | IMPLEMENTATION-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | ArcCore_Types.arxml:209 |
+| /ArcCore/Platform/ImplementationDataTypes/sint8 | IMPLEMENTATION-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | ArcCore_Types.arxml:179 |
+| /ArcCore/Platform/ImplementationDataTypes/uint16 | IMPLEMENTATION-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | ArcCore_Types.arxml:149 |
+| /ArcCore/Platform/ImplementationDataTypes/uint32 | IMPLEMENTATION-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | ArcCore_Types.arxml:164 |
+| /ArcCore/Platform/ImplementationDataTypes/uint8 | IMPLEMENTATION-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | ArcCore_Types.arxml:134 |
+| /Demo/Door/Door | APPLICATION-SW-COMPONENT-TYPE | [components/Door.md](../components/Door.md) | EcuExtract.arxml:10 |
+| /Demo/Door/Door/Command | P-PORT-PROTOTYPE | [components/Door.md](../components/Door.md) | EcuExtract.arxml:17 |
+| /Demo/Door/Door/DoorInternals/DoorMain | RUNNABLE-ENTITY | [components/Door.md](../components/Door.md) | EcuExtract.arxml:42 |
+| /Demo/Door/Door/DoorInternals/SetLocked | RUNNABLE-ENTITY | [components/Door.md](../components/Door.md) | EcuExtract.arxml:68 |
+| /Demo/Door/Door/Status | P-PORT-PROTOTYPE | [components/Door.md](../components/Door.md) | EcuExtract.arxml:13 |
+| /Demo/Door/DoorImplementation | SWC-IMPLEMENTATION | [components/Door.md](../components/Door.md) | EcuExtract.arxml:79 |
+| /Demo/DoorControl/DoorControl | APPLICATION-SW-COMPONENT-TYPE | [components/DoorControl.md](../components/DoorControl.md) | EcuExtract.arxml:419 |
+| /Demo/DoorControl/DoorControl/CombinedStatus | P-PORT-PROTOTYPE | [components/DoorControl.md](../components/DoorControl.md) | EcuExtract.arxml:442 |
+| /Demo/DoorControl/DoorControl/CommandsLeft | R-PORT-PROTOTYPE | [components/DoorControl.md](../components/DoorControl.md) | EcuExtract.arxml:430 |
+| /Demo/DoorControl/DoorControl/CommandsRight | R-PORT-PROTOTYPE | [components/DoorControl.md](../components/DoorControl.md) | EcuExtract.arxml:434 |
+| /Demo/DoorControl/DoorControl/DoorControlInternals/Main | RUNNABLE-ENTITY | [components/DoorControl.md](../components/DoorControl.md) | EcuExtract.arxml:459 |
+| /Demo/DoorControl/DoorControl/Led | R-PORT-PROTOTYPE | [components/DoorControl.md](../components/DoorControl.md) | EcuExtract.arxml:438 |
+| /Demo/DoorControl/DoorControl/StatusLeft | R-PORT-PROTOTYPE | [components/DoorControl.md](../components/DoorControl.md) | EcuExtract.arxml:422 |
+| /Demo/DoorControl/DoorControl/StatusRight | R-PORT-PROTOTYPE | [components/DoorControl.md](../components/DoorControl.md) | EcuExtract.arxml:426 |
+| /Demo/DoorControl/DoorControlImplementation | SWC-IMPLEMENTATION | [components/DoorControl.md](../components/DoorControl.md) | EcuExtract.arxml:572 |
+| /Demo/EDC/EDC | COMPOSITION-SW-COMPONENT-TYPE | [components/EDC.md](../components/EDC.md) | EcuExtract.arxml:597 |
+| /Demo/EDC/EDC/CombinedStatus | P-PORT-PROTOTYPE | [components/EDC.md](../components/EDC.md) | EcuExtract.arxml:600 |
+| /Demo/EDC/EDC/Control | SW-COMPONENT-PROTOTYPE | [components/EDC.md](../components/EDC.md) | EcuExtract.arxml:614 |
+| /Demo/EDC/EDC/DoorLeft | SW-COMPONENT-PROTOTYPE | [components/EDC.md](../components/EDC.md) | EcuExtract.arxml:606 |
+| /Demo/EDC/EDC/DoorRight | SW-COMPONENT-PROTOTYPE | [components/EDC.md](../components/EDC.md) | EcuExtract.arxml:610 |
+| /Demo/EDC/EDC/IO | SW-COMPONENT-PROTOTYPE | [components/EDC.md](../components/EDC.md) | EcuExtract.arxml:618 |
+| /Demo/EDC/EDCEcuExtract | SYSTEM | [system/EDCEcuExtract.md](../system/EDCEcuExtract.md) | EcuExtract.arxml:694 |
+| /Demo/EDC/EDCEcuExtract/EDCPrototype | ROOT-SW-COMPOSITION-PROTOTYPE | [system/EDCEcuExtract.md](../system/EDCEcuExtract.md) | EcuExtract.arxml:782 |
+| /Demo/EDC/SystemSignals/CombinedStatusLockedLeftSSig | SYSTEM-SIGNAL | [system/EDCEcuExtract.md](../system/EDCEcuExtract.md) | EcuExtract.arxml:793 |
+| /Demo/EDC/SystemSignals/CombinedStatusLockedRightSSig | SYSTEM-SIGNAL | [system/EDCEcuExtract.md](../system/EDCEcuExtract.md) | EcuExtract.arxml:799 |
+| /Demo/EDC/SystemSignals/CombinedStatusOpenLeftSSig | SYSTEM-SIGNAL | [system/EDCEcuExtract.md](../system/EDCEcuExtract.md) | EcuExtract.arxml:796 |
+| /Demo/EDC/SystemSignals/CombinedStatusOpenRightSSig | SYSTEM-SIGNAL | [system/EDCEcuExtract.md](../system/EDCEcuExtract.md) | EcuExtract.arxml:802 |
+| /Demo/EDC/Communication/CombinedStatusLockedLeftISig | I-SIGNAL | [system/EDCEcuExtract.md](../system/EDCEcuExtract.md) | EcuExtract.arxml:810 |
+| /Demo/EDC/Communication/CombinedStatusLockedLeftIPdu | I-SIGNAL-I-PDU | [system/EDCEcuExtract.md](../system/EDCEcuExtract.md) | EcuExtract.arxml:814 |
+| /Demo/EDC/Communication/CombinedStatusLockedRightISig | I-SIGNAL | [system/EDCEcuExtract.md](../system/EDCEcuExtract.md) | EcuExtract.arxml:836 |
+| /Demo/EDC/Communication/CombinedStatusLockedRightIPdu | I-SIGNAL-I-PDU | [system/EDCEcuExtract.md](../system/EDCEcuExtract.md) | EcuExtract.arxml:840 |
+| /Demo/EDC/Communication/CombinedStatusOpenLeftISig | I-SIGNAL | [system/EDCEcuExtract.md](../system/EDCEcuExtract.md) | EcuExtract.arxml:823 |
+| /Demo/EDC/Communication/CombinedStatusOpenLeftIPdu | I-SIGNAL-I-PDU | [system/EDCEcuExtract.md](../system/EDCEcuExtract.md) | EcuExtract.arxml:827 |
+| /Demo/EDC/Communication/CombinedStatusOpenRightISig | I-SIGNAL | [system/EDCEcuExtract.md](../system/EDCEcuExtract.md) | EcuExtract.arxml:849 |
+| /Demo/EDC/Communication/CombinedStatusOpenRightIPdu | I-SIGNAL-I-PDU | [system/EDCEcuExtract.md](../system/EDCEcuExtract.md) | EcuExtract.arxml:853 |
+| /Demo/Interfaces/CombinedStatus | SENDER-RECEIVER-INTERFACE | [interfaces/CombinedStatus.md](../interfaces/CombinedStatus.md) | EcuExtract.arxml:364 |
+| /Demo/Interfaces/CombinedStatus/LockedLeft | VARIABLE-DATA-PROTOTYPE | [interfaces/CombinedStatus.md](../interfaces/CombinedStatus.md) | EcuExtract.arxml:368 |
+| /Demo/Interfaces/CombinedStatus/LockedRight | VARIABLE-DATA-PROTOTYPE | [interfaces/CombinedStatus.md](../interfaces/CombinedStatus.md) | EcuExtract.arxml:390 |
+| /Demo/Interfaces/CombinedStatus/OpenLeft | VARIABLE-DATA-PROTOTYPE | [interfaces/CombinedStatus.md](../interfaces/CombinedStatus.md) | EcuExtract.arxml:379 |
+| /Demo/Interfaces/CombinedStatus/OpenRight | VARIABLE-DATA-PROTOTYPE | [interfaces/CombinedStatus.md](../interfaces/CombinedStatus.md) | EcuExtract.arxml:401 |
+| /Demo/Interfaces/DoorCommands | CLIENT-SERVER-INTERFACE | [interfaces/DoorCommands.md](../interfaces/DoorCommands.md) | EcuExtract.arxml:348 |
+| /Demo/Interfaces/DoorCommands/SetLock | CLIENT-SERVER-OPERATION | [interfaces/DoorCommands.md](../interfaces/DoorCommands.md) | EcuExtract.arxml:352 |
+| /Demo/Interfaces/DoorStatus | SENDER-RECEIVER-INTERFACE | [interfaces/DoorStatus.md](../interfaces/DoorStatus.md) | EcuExtract.arxml:320 |
+| /Demo/Interfaces/DoorStatus/Locked | VARIABLE-DATA-PROTOTYPE | [interfaces/DoorStatus.md](../interfaces/DoorStatus.md) | EcuExtract.arxml:324 |
+| /Demo/Interfaces/DoorStatus/Open | VARIABLE-DATA-PROTOTYPE | [interfaces/DoorStatus.md](../interfaces/DoorStatus.md) | EcuExtract.arxml:335 |
+| /Demo/Services/IoHwAb/DigitalLevel | IMPLEMENTATION-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | EcuExtract.arxml:179 |
+| /Demo/Services/IoHwAb/DigitalLevel_def | COMPU-METHOD | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | EcuExtract.arxml:191 |
+| /Demo/Services/IoHwAb/DigitalServiceWrite | CLIENT-SERVER-INTERFACE | [interfaces/DigitalServiceWrite.md](../interfaces/DigitalServiceWrite.md) | EcuExtract.arxml:213 |
+| /Demo/Services/IoHwAb/DigitalServiceWrite/Write | CLIENT-SERVER-OPERATION | [interfaces/DigitalServiceWrite.md](../interfaces/DigitalServiceWrite.md) | EcuExtract.arxml:217 |
+| /Demo/Services/IoHwAb/IoHwAb | SERVICE-SW-COMPONENT-TYPE | [components/IoHwAb.md](../components/IoHwAb.md) | EcuExtract.arxml:243 |
+| /Demo/Services/IoHwAb/IoHwAb/Digital_Led | P-PORT-PROTOTYPE | [components/IoHwAb.md](../components/IoHwAb.md) | EcuExtract.arxml:246 |
+| /Demo/Services/IoHwAb/IoHwAb/IoHwAbBehavior/DigitalWrite | RUNNABLE-ENTITY | [components/IoHwAb.md](../components/IoHwAb.md) | EcuExtract.arxml:282 |
+| /Demo/Services/IoHwAb/IoHwAbImpl | SWC-IMPLEMENTATION | [components/IoHwAb.md](../components/IoHwAb.md) | EcuExtract.arxml:293 |
+| /Demo/Services/IoHwAb/IoHwAb_SignalType_ | IMPLEMENTATION-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | EcuExtract.arxml:107 |
+| /Demo/Services/IoHwAb/SignalQuality | IMPLEMENTATION-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | EcuExtract.arxml:131 |
+| /Demo/Services/IoHwAb/SignalQuality_def | COMPU-METHOD | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | EcuExtract.arxml:143 |
+| /Demo/Services/IoHwAb/dummy_IoHwAb_SignalType_ | APPLICATION-PRIMITIVE-DATA-TYPE | [platform/ImplementationDataTypes.md](../platform/ImplementationDataTypes.md) | EcuExtract.arxml:118 |
