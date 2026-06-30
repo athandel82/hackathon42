@@ -1,0 +1,4 @@
+# Test + lint tooling (not shipped in the Lambda image).
+-r requirements.txt
+pytest>=8.0
+ruff>=0.5

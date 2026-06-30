@@ -1,0 +1,5 @@
+# Pinned runtime dependencies for the Lambda container image.
+# KB navigation uses only the Python standard library (re, json, pathlib).
+strands-agents>=1.0.0,<2.0.0
+boto3>=1.34,<2.0.0
+pydantic>=2,<3
