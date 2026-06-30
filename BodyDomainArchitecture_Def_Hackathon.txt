@@ -1,0 +1,68 @@
+# Enhanced System Composer Requirements Import Template
+ARCHITECTURE: BodyDomainArchitecture
+
+[INTERFACES]
+INTERFACE RainInterface
+RainIntensity:uint8
+SensorStatus:uint8
+
+INTERFACE WiperInterface
+WiperModeCmd:uint8
+CurrentWiperMode:uint8
+
+INTERFACE RoofInterface
+RoofPositionCmd:uint8
+CurrentRoofPosition:uint8
+RoofState:uint8
+
+[COMPONENT] VehicleSpeedSensor
+REQ_ID=VSS-001; TYPE=Functional; PRIORITY=High; The Vehicle Speed Sensor shall provide vehicle speed every 50 ms.
+
+[COMPONENT] RainSensor
+REQ_ID=RS-001; TYPE=Functional; PRIORITY=High; The Rain Sensor ECU shall detect water droplets every 100 ms.
+REQ_ID=RS-002; TYPE=Functional; PRIORITY=High; The Rain Sensor ECU shall classify rain intensity into No Rain, Drizzle, Light Rain, and Heavy Rain.
+REQ_ID=RS-003; TYPE=Communication; PRIORITY=High; The Rain Sensor ECU shall transmit RainIntensity to the Wiper ECU and Body Domain Controller.
+REQ_ID=RS-004; TYPE=Diagnostic; PRIORITY=High; The Rain Sensor ECU shall detect sensor faults and report SensorStatus=Failed.
+REQ_ID=RS-005; TYPE=Diagnostic; PRIORITY=Medium; The Rain Sensor ECU shall suppress invalid measurements during self-test.
+REQ_ID=RS-006; TYPE=Diagnostic; PRIORITY=High; The Rain Sensor ECU shall report Diagnostic Trouble Code RS001 upon sensor failure.
+
+[COMPONENT] WiperECU
+REQ_ID=WE-001; TYPE=Functional; PRIORITY=High; The Wiper ECU shall activate intermittent wiping when RainIntensity=Drizzle.
+REQ_ID=WE-002; TYPE=Functional; PRIORITY=High; The Wiper ECU shall set wiper speed according to RainIntensity.
+REQ_ID=WE-003; TYPE=Functional; PRIORITY=High; The Wiper ECU shall switch to High Speed mode when RainIntensity=Heavy Rain.
+REQ_ID=WE-004; TYPE=Functional; PRIORITY=Medium; The Wiper ECU shall prioritize Body Domain Controller commands.
+REQ_ID=WE-005; TYPE=Safety; PRIORITY=High; The Wiper ECU shall switch to a safe operating mode if RainIntensity is unavailable.
+REQ_ID=WE-006; TYPE=Safety; PRIORITY=High; If RainIntensity is unavailable for more than 5 seconds, the Wiper ECU shall switch to LowSpeed mode.
+
+[COMPONENT] GlassRoofECU
+REQ_ID=GR-001; TYPE=Functional; PRIORITY=High; The Glass Roof ECU shall support Closed, Vent, 25%, 50%, and 100% open positions.
+REQ_ID=GR-002; TYPE=Functional; PRIORITY=High; The Glass Roof ECU shall initiate roof closing within 100 ms after receiving a CloseRoof command.
+REQ_ID=GR-003; TYPE=Communication; PRIORITY=Medium; The Glass Roof ECU shall continuously transmit CurrentRoofPosition.
+REQ_ID=GR-004; TYPE=Safety; PRIORITY=High; The Glass Roof ECU shall stop roof movement when an obstacle is detected.
+REQ_ID=GR-005; TYPE=Diagnostic; PRIORITY=Medium; The Glass Roof ECU shall report RoofState and diagnostic status.
+REQ_ID=GR-006; TYPE=Safety; PRIORITY=High; The Glass Roof ECU shall stop movement within 50 ms after obstacle detection.
+REQ_ID=GR-007; TYPE=Diagnostic; PRIORITY=Medium; The Glass Roof ECU shall report Diagnostic Trouble Code GR001 when motor stall is detected.
+
+[COMPONENT] BodyDomainController
+REQ_ID=BDC-001; TYPE=Functional; PRIORITY=High; The Body Domain Controller shall receive RainIntensity from the Rain Sensor ECU.
+REQ_ID=BDC-002; TYPE=Functional; PRIORITY=High; If RainIntensity >= Light Rain and roof is not closed, the controller shall issue a CloseRoof command.
+REQ_ID=BDC-003; TYPE=Functional; PRIORITY=Medium; The controller shall notify the driver whenever automatic roof closing occurs.
+REQ_ID=BDC-004; TYPE=Safety; PRIORITY=High; If VehicleSpeed > 80 km/h and RainIntensity >= Light Rain, the controller shall command roof closure.
+REQ_ID=BDC-005; TYPE=Communication; PRIORITY=High; The controller shall distribute RoofPositionCmd and WiperModeCmd.
+REQ_ID=BDC-006; TYPE=Communication; PRIORITY=High; The controller shall communicate with all Body ECUs via CAN-FD.
+REQ_ID=BDC-007; TYPE=Diagnostic; PRIORITY=High; The controller shall detect communication timeout within 500 ms.
+REQ_ID=BDC-008; TYPE=Innovation; PRIORITY=Medium; The controller shall use weather forecast information to pre-close the roof before predicted rainfall.
+
+[SYSTEM_REQUIREMENTS]
+REQ_ID=SYS-001; The vehicle shall automatically protect the passenger compartment from rain ingress.
+REQ_ID=SYS-002; The vehicle shall maintain driver visibility during rainfall.
+REQ_ID=SYS-003; The vehicle shall coordinate roof and wiper behavior using a central Body Domain Controller.
+REQ_ID=SYS-004; The vehicle shall report faults detected by connected Body Domain ECUs.
+REQ_ID=SYS-005; The vehicle shall inform the driver whenever automatic weather-related actions are executed.
+
+[TRACEABILITY]
+SYS-001 -> BDC-002,GR-002
+SYS-002 -> WE-001,WE-002,WE-003
+SYS-003 -> BDC-001,BDC-005
+SYS-004 -> RS-006,GR-007,BDC-007
+SYS-005 -> BDC-003
