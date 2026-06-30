@@ -1,0 +1,120 @@
+{
+  "change_request": "remove the Door component",
+  "target_nodes": [
+    { "id": "Door", "label": "Door", "type": "ApplicationSwComponent" }
+  ],
+  "what_breaks": {
+    "summary": "Removing Door breaks DoorControl and EDC and severs all 4 CombinedStatus signal chains at their source.",
+    "impacted": [
+      {
+        "id": "DoorControl",
+        "type": "ApplicationSwComponent",
+        "hops": 1,
+        "via": ["DoorStatus", "DoorCommands"],
+        "severity": "high",
+        "domain": "Body",
+        "explanation": "DoorControl loses its StatusLeft/StatusRight inputs and CommandsLeft/CommandsRight targets — its status aggregation can no longer run."
+      },
+      {
+        "id": "EDC",
+        "type": "CompositionSwComponent",
+        "hops": 1,
+        "via": ["containment"],
+        "severity": "high",
+        "domain": "Body",
+        "explanation": "The EDC composition loses both DoorLeft and DoorRight instances, changing the root assembly."
+      },
+      {
+        "id": "CombinedStatusLockedLeftIPdu",
+        "type": "I-PDU",
+        "hops": 3,
+        "via": ["DoorControl.CombinedStatus", "EDC.CombinedStatus", "CombinedStatusLockedLeftISig"],
+        "severity": "high",
+        "domain": "Body",
+        "explanation": "Lock-status (left) chain loses its source; the network PDU is no longer populated."
+      },
+      {
+        "id": "CombinedStatusOpenLeftIPdu",
+        "type": "I-PDU",
+        "hops": 3,
+        "via": ["DoorControl.CombinedStatus", "EDC.CombinedStatus", "CombinedStatusOpenLeftISig"],
+        "severity": "high",
+        "domain": "Body",
+        "explanation": "Open-status (left) chain loses its source; the network PDU is no longer populated."
+      },
+      {
+        "id": "CombinedStatusLockedRightIPdu",
+        "type": "I-PDU",
+        "hops": 3,
+        "via": ["DoorControl.CombinedStatus", "EDC.CombinedStatus", "CombinedStatusLockedRightISig"],
+        "severity": "medium",
+        "domain": "Body",
+        "explanation": "Lock-status (right) chain loses its source; the network PDU is no longer populated."
+      },
+      {
+        "id": "CombinedStatusOpenRightIPdu",
+        "type": "I-PDU",
+        "hops": 3,
+        "via": ["DoorControl.CombinedStatus", "EDC.CombinedStatus", "CombinedStatusOpenRightISig"],
+        "severity": "medium",
+        "domain": "Body",
+        "explanation": "Open-status (right) chain loses its source; the network PDU is no longer populated."
+      }
+    ],
+    "graph": {
+      "nodes": [
+        { "id": "Door", "label": "Door", "type": "target" },
+        { "id": "DoorControl", "label": "DoorControl", "type": "component" },
+        { "id": "EDC", "label": "EDC", "type": "composition" },
+        { "id": "CombinedStatusLockedLeftIPdu", "label": "LockedLeft PDU", "type": "pdu" },
+        { "id": "CombinedStatusOpenLeftIPdu", "label": "OpenLeft PDU", "type": "pdu" },
+        { "id": "CombinedStatusLockedRightIPdu", "label": "LockedRight PDU", "type": "pdu" },
+        { "id": "CombinedStatusOpenRightIPdu", "label": "OpenRight PDU", "type": "pdu" }
+      ],
+      "edges": [
+        { "from": "Door", "to": "DoorControl", "label": "DoorStatus/DoorCommands" },
+        { "from": "Door", "to": "EDC", "label": "containment" },
+        { "from": "DoorControl", "to": "CombinedStatusLockedLeftIPdu", "label": "CombinedStatus" },
+        { "from": "DoorControl", "to": "CombinedStatusOpenLeftIPdu", "label": "CombinedStatus" },
+        { "from": "DoorControl", "to": "CombinedStatusLockedRightIPdu", "label": "CombinedStatus" },
+        { "from": "DoorControl", "to": "CombinedStatusOpenRightIPdu", "label": "CombinedStatus" }
+      ]
+    }
+  },
+  "what_it_costs": {
+    "bom_saved": { "low": 12.0, "high": 22.0, "currency": "USD", "basis": "per-vehicle" },
+    "eng_rework": { "low": 80, "high": 200, "unit": "engineer-hours" },
+    "net_assessment": "favorable",
+    "line_items": [
+      { "label": "Re-map CombinedStatus signals", "low": 40, "high": 90, "unit": "hours" },
+      { "label": "Update EDC composition + integration test", "low": 30, "high": 80, "unit": "hours" },
+      { "label": "Remove door hardware harness", "low": 10, "high": 30, "unit": "hours" }
+    ]
+  },
+  "what_it_risks": {
+    "items": [
+      {
+        "category": "network",
+        "severity": "high",
+        "title": "Body CAN loses 4 CombinedStatus signals",
+        "detail": "All four CombinedStatus* I-PDUs lose their source; any ECU consuming door lock/open status must be re-validated or gracefully degraded.",
+        "revalidation_required": true
+      },
+      {
+        "category": "safety",
+        "severity": "medium",
+        "title": "Door-ajar / lock indication unavailable",
+        "detail": "Downstream features relying on door open/lock state (e.g. interior lighting, drive-away lock) lose their input.",
+        "revalidation_required": true
+      },
+      {
+        "category": "diagnostic",
+        "severity": "low",
+        "title": "Stale DTCs for removed door module",
+        "detail": "Diagnostic configuration may still reference the removed door ECU and report missing-node faults.",
+        "revalidation_required": false
+      }
+    ]
+  },
+  "confidence": { "level": "medium", "model_agreement": null }
+}

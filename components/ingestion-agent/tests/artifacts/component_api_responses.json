@@ -1,0 +1,191 @@
+{
+  "generated_at": "2026-06-30T11:36:58.341450+00:00",
+  "repo": "https://github.com/patrikja/autosar@master",
+  "repo_id": "patrikja__autosar__master",
+  "note": "Bedrock LLM and AWS SDK stubbed; ARXML fetch+parse are real.",
+  "status_table_final": {
+    "patrikja__autosar__master": {
+      "repo_id": "patrikja__autosar__master",
+      "status": "READY",
+      "meta": {
+        "github_url": "https://github.com/patrikja/autosar",
+        "branch": "master",
+        "location": "s3://component-test-bucket/patrikja__autosar__master/kb/"
+      },
+      "updated_at": "2026-06-30T11:36:58.337495+00:00"
+    }
+  },
+  "kb_files_uploaded": [
+    "patrikja__autosar__master/kb/README.md",
+    "patrikja__autosar__master/kb/_index/components.md",
+    "patrikja__autosar__master/kb/_index/path-index.md",
+    "patrikja__autosar__master/kb/_index/source-map.md",
+    "patrikja__autosar__master/kb/_index/stats.md",
+    "patrikja__autosar__master/kb/components/Door.md",
+    "patrikja__autosar__master/kb/components/DoorControl.md",
+    "patrikja__autosar__master/kb/components/EDC.md",
+    "patrikja__autosar__master/kb/components/IoHwAb.md"
+  ],
+  "api_cases": [
+    {
+      "case": "post_ingest_valid",
+      "description": "POST /ingest with a valid body",
+      "request": {
+        "rawPath": "/ingest",
+        "requestContext": {
+          "http": {
+            "method": "POST"
+          }
+        },
+        "body": "{\"github_url\": \"https://github.com/patrikja/autosar\", \"branch\": \"master\"}"
+      },
+      "response": {
+        "statusCode": 202,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"repo_id\": \"patrikja__autosar__master\", \"status\": \"PENDING\"}"
+      }
+    },
+    {
+      "case": "get_status_pending",
+      "description": "GET /status immediately after submit",
+      "request": {
+        "rawPath": "/status",
+        "requestContext": {
+          "http": {
+            "method": "GET"
+          }
+        },
+        "queryStringParameters": {
+          "repo_id": "patrikja__autosar__master"
+        }
+      },
+      "response": {
+        "statusCode": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"repo_id\": \"patrikja__autosar__master\", \"status\": \"PENDING\", \"meta\": {\"github_url\": \"https://github.com/patrikja/autosar\", \"branch\": \"master\"}}"
+      }
+    },
+    {
+      "case": "worker_run",
+      "description": "Async worker invocation (real ingest, stubbed LLM)",
+      "request": {
+        "mode": "worker",
+        "github_url": "https://github.com/patrikja/autosar",
+        "branch": "master",
+        "repo_id": "patrikja__autosar__master"
+      },
+      "response": {
+        "repo_id": "patrikja__autosar__master",
+        "status": "READY",
+        "location": "s3://component-test-bucket/patrikja__autosar__master/kb/"
+      }
+    },
+    {
+      "case": "get_status_ready",
+      "description": "GET /status after the worker finished",
+      "request": {
+        "rawPath": "/status",
+        "requestContext": {
+          "http": {
+            "method": "GET"
+          }
+        },
+        "queryStringParameters": {
+          "repo_id": "patrikja__autosar__master"
+        }
+      },
+      "response": {
+        "statusCode": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"repo_id\": \"patrikja__autosar__master\", \"status\": \"READY\", \"meta\": {\"github_url\": \"https://github.com/patrikja/autosar\", \"branch\": \"master\", \"location\": \"s3://component-test-bucket/patrikja__autosar__master/kb/\"}}"
+      }
+    },
+    {
+      "case": "post_ingest_missing_url",
+      "description": "POST /ingest without github_url",
+      "request": {
+        "rawPath": "/ingest",
+        "requestContext": {
+          "http": {
+            "method": "POST"
+          }
+        },
+        "body": "{\"branch\": \"master\"}"
+      },
+      "response": {
+        "statusCode": 400,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"error\": \"github_url is required\"}"
+      }
+    },
+    {
+      "case": "get_status_unknown",
+      "description": "GET /status for an unknown repo_id",
+      "request": {
+        "rawPath": "/status",
+        "requestContext": {
+          "http": {
+            "method": "GET"
+          }
+        },
+        "queryStringParameters": {
+          "repo_id": "nope__nope__main"
+        }
+      },
+      "response": {
+        "statusCode": 404,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"error\": \"unknown repo_id: nope__nope__main\"}"
+      }
+    },
+    {
+      "case": "get_status_missing_param",
+      "description": "GET /status without repo_id",
+      "request": {
+        "rawPath": "/status",
+        "requestContext": {
+          "http": {
+            "method": "GET"
+          }
+        },
+        "queryStringParameters": {}
+      },
+      "response": {
+        "statusCode": 400,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"error\": \"repo_id is required\"}"
+      }
+    },
+    {
+      "case": "method_not_allowed",
+      "description": "PUT /ingest (unsupported method)",
+      "request": {
+        "rawPath": "/ingest",
+        "requestContext": {
+          "http": {
+            "method": "PUT"
+          }
+        }
+      },
+      "response": {
+        "statusCode": 405,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"error\": \"method not allowed: PUT\"}"
+      }
+    }
+  ]
+}

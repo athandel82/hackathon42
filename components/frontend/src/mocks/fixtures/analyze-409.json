@@ -1,0 +1,4 @@
+{
+  "error": "repo_not_ready",
+  "message": "Repository is missing or not READY. Run onboarding first."
+}
