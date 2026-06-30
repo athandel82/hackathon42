@@ -1,0 +1,270 @@
+<mxfile host="app.diagrams.net" agent="kiro" version="24.0.0">
+  <diagram id="sdv-deploy" name="SDV — Deployment Architecture">
+    <mxGraphModel dx="2000" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1850" pageHeight="1820" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ===================== TITLE ===================== -->
+        <mxCell id="title" value="SDV — &quot;Still Defined Vehicle&quot; · AWS Deployment Architecture (Terraform, us-east-1, single dev env)" style="text;html=1;fontSize=20;fontStyle=1;align=left;verticalAlign=middle;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1200" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Read-only ECU change impact analysis. Two in-process Strands agents on Lambda + Amazon Bedrock (Claude). Note: this design uses the Strands Agents SDK inside Lambda — NOT Bedrock AgentCore Runtime (see callout)." style="text;html=1;fontSize=12;fontStyle=2;align=left;verticalAlign=middle;fontColor=#5A6C86;" vertex="1" parent="1">
+          <mxGeometry x="40" y="52" width="1400" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== ZONES ===================== -->
+        <mxCell id="zClient" value="CLIENT" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#5A6C86;dashed=1;verticalAlign=top;fontStyle=1;fontSize=13;align=left;spacingLeft=10;spacingTop=6;fontColor=#5A6C86;" vertex="1" parent="1">
+          <mxGeometry x="40" y="90" width="330" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="zVPC" value="VPC — reused public subnet + security group (Frontend hosting only)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#8C4FFF;dashed=1;verticalAlign=top;fontStyle=1;fontSize=12;align=left;spacingLeft=10;spacingTop=6;fontColor=#8C4FFF;" vertex="1" parent="1">
+          <mxGeometry x="40" y="320" width="340" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="zAPI" value="EDGE / API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#E7157B;dashed=1;verticalAlign=top;fontStyle=1;fontSize=13;align=left;spacingLeft=10;spacingTop=6;fontColor=#E7157B;" vertex="1" parent="1">
+          <mxGeometry x="430" y="320" width="320" height="250" as="geometry" />
+        </mxCell>
+
+        <mxCell id="zAgent" value="AGENTIC COMPUTE — AWS Lambda (container images, x86_64) · Strands Agents SDK running IN-PROCESS · one Bedrock model" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#ED7100;dashed=0;verticalAlign=top;fontStyle=1;fontSize=14;align=center;spacingTop=8;fontColor=#9A4E00;" vertex="1" parent="1">
+          <mxGeometry x="430" y="630" width="1000" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="zIngest" value="Ingestion Agent  (builds the KB)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ED7100;dashed=0;verticalAlign=top;fontStyle=1;fontSize=12;align=left;spacingLeft=10;spacingTop=6;fontColor=#9A4E00;" vertex="1" parent="1">
+          <mxGeometry x="450" y="690" width="470" height="510" as="geometry" />
+        </mxCell>
+        <mxCell id="zAnalyze" value="Analyze Agent  (answers change requests)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#ED7100;dashed=0;verticalAlign=top;fontStyle=1;fontSize=12;align=left;spacingLeft=10;spacingTop=6;fontColor=#9A4E00;" vertex="1" parent="1">
+          <mxGeometry x="940" y="690" width="470" height="510" as="geometry" />
+        </mxCell>
+
+        <mxCell id="zBedrock" value="MACHINE LEARNING" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#01A88D;dashed=1;verticalAlign=top;fontStyle=1;fontSize=13;align=left;spacingLeft=10;spacingTop=6;fontColor=#01A88D;" vertex="1" parent="1">
+          <mxGeometry x="1470" y="630" width="340" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="zStorage" value="STORAGE &amp; STATE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#7AA116;dashed=1;verticalAlign=top;fontStyle=1;fontSize=13;align=left;spacingLeft=10;spacingTop=6;fontColor=#7AA116;" vertex="1" parent="1">
+          <mxGeometry x="430" y="1270" width="1000" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="zObs" value="OBSERVABILITY" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#E7157B;dashed=1;verticalAlign=top;fontStyle=1;fontSize=13;align=left;spacingLeft=10;spacingTop=6;fontColor=#E7157B;" vertex="1" parent="1">
+          <mxGeometry x="1470" y="950" width="340" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="zBuild" value="BUILD &amp; IaC" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#232F3E;dashed=1;verticalAlign=top;fontStyle=1;fontSize=13;align=left;spacingLeft=10;spacingTop=6;fontColor=#232F3E;" vertex="1" parent="1">
+          <mxGeometry x="40" y="630" width="360" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="zCache" value="CACHING &amp; PERFORMANCE LAYERS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#2E73B8;dashed=0;verticalAlign=top;fontStyle=1;fontSize=14;align=center;spacingTop=8;fontColor=#1A4F7A;" vertex="1" parent="1">
+          <mxGeometry x="430" y="1580" width="1380" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== CLIENT ===================== -->
+        <mxCell id="user" value="Engineer / Browser" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3E;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.user;" vertex="1" parent="1">
+          <mxGeometry x="70" y="135" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="spa" value="React + Vite + Cloudscape SPA&#10;• reads config.json at runtime (apiBaseUrl, useStub:false)&#10;• Screen 1: paste GitHub URL → ingest&#10;• Screen 2: chat → impact cards (breaks / cost / risk)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#D6B656;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="160" y="120" width="195" height="145" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== FRONTEND EC2 ===================== -->
+        <mxCell id="ec2" value="EC2 t3.small · AL2023 x86_64" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;" vertex="1" parent="1">
+          <mxGeometry x="70" y="385" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="ec2note" value="Serves the SPA only (no app logic)&#10;• nginx via systemd start.sh (Restart=always)&#10;• user-data: dnf git/node/npm → git clone → vite build → write config.json → serve dist/ on :8443&#10;• associate_public_ip; reuses existing subnet + SG&#10;• user_data_replace_on_change = true" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#D6B656;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="145" y="360" width="225" height="195" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== API GATEWAY ===================== -->
+        <mxCell id="apigw" value="API Gateway (HTTP API)" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;" vertex="1" parent="1">
+          <mxGeometry x="450" y="385" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="apinote" value="$default stage · auto_deploy&#10;CORS * (allow_origins/methods/headers; max_age 3600)&#10;No authorizer (OPEN — prototype)&#10;AWS_PROXY · payload format 2.0&#10;Routes:&#10;• POST /ingest → Ingest λ (202)&#10;• GET  /status → Ingest λ&#10;• POST /analyze → Analyze λ (sync, 30s cap)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#E7157B;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="520" y="360" width="220" height="195" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== INGEST AGENT ===================== -->
+        <mxCell id="ingestLambda" value="Ingest λ · 10240MB · 900s · /tmp 10GB · reserved conc. 2" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="475" y="745" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="ingestAgent" value="Strands Agent (in-process)&#10;• BedrockModel(temperature=0.0)&#10;• system_prompt = skill.md (AUTOSAR ARXML KB v2 — Indexed &amp; Relationship-Aware)&#10;• agent loop sequences @tool calls per the skill (index-first); LLM only orchestrates" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#ED7100;align=left;verticalAlign=top;spacing=6;fontSize=10;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="460" y="825" width="450" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="ingestTools" value="@tool (deterministic, stdlib):&#10;• scan_repo — fetch GitHub tarball (no clone), extract, iterparse every .arxml&#10;• write_kb_file — write Markdown into /tmp KB tree&#10;• record_status — DynamoDB repos status" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#D6B656;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="460" y="935" width="450" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ingestModes" value="handler.py modes:&#10;• api (sync): validate → write PENDING → async SELF-INVOKE (InvocationType=Event) → return 202 {repo_id}  (beats API GW 30s)&#10;• worker (async): build agent, run skill §4 (index → graph → signal-chains → detail files), sync /tmp KB → S3, set READY/FAILED&#10;Procedure produces _index/ (path-index, dependency-graph reverse-deps, signal-chains, …) + per-element detail files" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#D6B656;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="460" y="1035" width="450" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== ANALYZE AGENT ===================== -->
+        <mxCell id="analyzeLambda" value="Analyze λ · 10240MB · 900s (sync capped 30s API GW) · /tmp 10GB · reserved conc. 5" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+          <mxGeometry x="965" y="745" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="analyzeAgent" value="Strands Agent (in-process)&#10;• BedrockModel(temperature=0.0)&#10;• system_prompt = analyze_prompt.md&#10;• agent(prompt, structured_output_model=ResultEnvelope)&#10;  → normal agent loop + ONE schema-valid Pydantic envelope&#10;  (avoids deprecated structured_output() tool_choice=any issue on Claude 4.x)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#ED7100;align=left;verticalAlign=top;spacing=6;fontSize=10;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="950" y="825" width="450" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="analyzeTools" value="@tool (READ-ONLY KB navigation, no model calls):&#10;• resolve_path — _index/path-index.md → detail file&#10;• blast_radius — _index/dependency-graph.md (reverse adjacency)&#10;• trace_signals — _index/signal-chains.md&#10;• kb_read — any KB Markdown file" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#D6B656;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="950" y="955" width="450" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="analyzeFlow" value="Flow (core.run_analyze):&#10;① cache check (DynamoDB) → warm hit returns envelope immediately&#10;② resolve target → ③ reverse-deps + signal-chains (precomputed, exact)&#10;④ detail-on-demand reads → ⑤ ONE Bedrock structured-output call&#10;⑥ cache put → return ResultEnvelope (what_breaks / what_it_costs / what_it_risks / confidence)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#D6B656;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="950" y="1065" width="450" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== BEDROCK ===================== -->
+        <mxCell id="bedrock" value="Amazon Bedrock" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#01A88D;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=11;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.bedrock;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="700" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="bedrocknote" value="Claude Opus 4.5&#10;us.anthropic.claude-opus-4-5-20251101-v1:0&#10;(cross-region inference profile)&#10;bedrock:InvokeModel (+ WithResponseStream)&#10;IAM scoped to:&#10;• foundation-model/*&#10;• inference-profile/*&#10;Single shared model for both agents." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#01A88D;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1490" y="775" width="300" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== STORAGE ===================== -->
+        <mxCell id="s3" value="S3 — KB bucket" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.simple_storage_service;" vertex="1" parent="1">
+          <mxGeometry x="475" y="1320" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="s3note" value="{prefix}-kb-{account_id}&#10;• &lt;repo_id&gt;/kb/  Markdown KB tree (_index/ + detail files)&#10;• &lt;repo_id&gt;/raw/  ARXML (optional)&#10;• SSE-AES256 · public access fully blocked · force_destroy&#10;Ingest = RW · Analyze = READ-ONLY (hard safety property)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1F8E9;strokeColor=#7AA116;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="445" y="1390" width="295" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ddbRepos" value="DynamoDB — repos" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#C925D1;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;" vertex="1" parent="1">
+          <mxGeometry x="800" y="1320" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="ddbReposNote" value="PAY_PER_REQUEST&#10;hash_key = repo_id&#10;Ingestion status:&#10;PENDING → READY / FAILED&#10;(Ingest RW · /status &amp; Analyze read)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4F7;strokeColor=#C925D1;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="770" y="1390" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="ddbResults" value="DynamoDB — results" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#C925D1;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="1320" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="ddbResultsNote" value="PAY_PER_REQUEST&#10;hash_key = result_id&#10;  = &lt;repo_id&gt;#sha256(repo_id+norm request)[:32]&#10;Single-table: analysis CACHE + chat sessions&#10;result stored as JSON string (avoids Decimal)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4F7;strokeColor=#C925D1;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="1390" width="225" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="secrets" value="Secrets Manager" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#DD344C;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.secrets_manager;" vertex="1" parent="1">
+          <mxGeometry x="1310" y="1320" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="secretsNote" value="GitHub token&#10;(private repos only — optional;&#10;IAM grant added only when configured)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4E8;strokeColor=#DD344C;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="1390" width="130" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== OBSERVABILITY ===================== -->
+        <mxCell id="cw" value="CloudWatch" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudwatch_2;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="1005" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="cwnote" value="Log groups: /aws/lambda/{prefix}-ingest, -analyze&#10;retention_in_days = 14&#10;Lambda logs + Strands traces" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#E7157B;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1490" y="1075" width="300" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== BUILD / IaC ===================== -->
+        <mxCell id="tfnote" value="Terraform (IaC) — AWS provider ~&gt;5.0&#10;• backend: S3 state + DynamoDB lock&#10;• modules: storage → compute → api → frontend&#10;• apply order acyclic (CORS * breaks EC2↔API cycle)&#10;• single dev env" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECECEC;strokeColor=#232F3E;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="55" y="665" width="330" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="ecrIngest" value="ECR — ingest" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elastic_container_registry;" vertex="1" parent="1">
+          <mxGeometry x="80" y="800" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="ecrAnalyze" value="ECR — analyze" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elastic_container_registry;" vertex="1" parent="1">
+          <mxGeometry x="250" y="800" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="ecrNote" value="package_type = Image · x86_64&#10;image tag = sha1(content of build context)&#10;→ any source change rebuilds/pushes via&#10;build_and_push.sh (null_resource local-exec)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#ED7100;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="55" y="875" width="330" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== EXTERNAL: GitHub ===================== -->
+        <mxCell id="github" value="GitHub repo — AUTOSAR ARXML ECU Extract&#10;tarball: /archive/refs/heads/&lt;branch&gt;.tar.gz" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;align=center;verticalAlign=middle;spacing=6;fontSize=10;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="55" y="1030" width="240" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== AGENTCORE CLARIFICATION ===================== -->
+        <mxCell id="acNote" value="⚠ AgentCore note: the README markets &quot;leveraging AgentCore&quot;, but the deployed design runs the Strands Agents SDK IN-PROCESS inside Lambda container images (no Bedrock AgentCore Runtime, Gateway, Memory, or Identity in the code/Terraform). A future migration could lift each in-process Strands agent onto Bedrock AgentCore Runtime — Lambda would become the thin adapter and AgentCore would own the agent loop + session memory." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;align=left;verticalAlign=top;spacing=8;fontSize=11;fontStyle=2;fontColor=#7A5C00;" vertex="1" parent="1">
+          <mxGeometry x="1470" y="1180" width="340" height="200" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== CACHE LEGEND ===================== -->
+        <mxCell id="c1" value="① Analyze Result Cache (DynamoDB &apos;results&apos;)&#10;key = repo_id + sha256(normalized change_request).&#10;cache_get runs BEFORE the agent → warm hit returns the full envelope with zero Bedrock calls; cache_put after synthesis. FileCache (results.json) is the local-mode fallback." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2E73B8;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="450" y="1620" width="320" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="② In-run KB Read Cache (KBSource._cache)&#10;In-memory dict per Lambda invocation. Each rel_path is fetched from S3 (or disk) once and reused across resolve_path / blast_radius / trace_signals / kb_read — the small _index/ files are read many times per request." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2E73B8;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="790" y="1620" width="320" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="③ Ephemeral /tmp staging (10 GB)&#10;Ingest: KB_WORKDIR=/tmp builds the full KB tree locally, then ONE bulk sync → S3.&#10;Analyze: KB_CACHE_DIR=/tmp optional in-run KB staging.&#10;⑤ ECR content-hash image cache (rebuild only on source change).&#10;⑥ API GW CORS preflight cache (max_age 3600)." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2E73B8;align=left;verticalAlign=top;spacing=6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1130" y="1620" width="320" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" value="④ Precomputed Relationship KB  (the architectural cache)&#10;Blast-radius reverse-dependency adjacency + end-to-end signal-chains are computed ONCE at ingestion and persisted as deterministic Markdown indices in S3. At analysis time the agent NAVIGATES these indices and never re-derives the graph — exact, fast, and the reason a single Bedrock call suffices." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A4F7A;align=left;verticalAlign=top;spacing=6;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1470" y="1620" width="320" height="160" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== EDGES ===================== -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;startArrow=none;strokeColor=#232F3E;fontSize=10;" edge="1" parent="1" source="user" target="ec2">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e1l" value="HTTPS GET SPA (public DNS :8443)" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e1"><mxGeometry x="-0.2" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#E7157B;fontSize=10;dashed=0;" edge="1" parent="1" source="spa" target="apigw">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e2l" value="HTTPS · CORS * · /ingest /status /analyze" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e2"><mxGeometry x="-0.1" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#E7157B;fontSize=10;" edge="1" parent="1" source="apigw" target="ingestLambda">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e4l" value="POST /ingest · GET /status" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e4"><mxGeometry x="-0.2" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#E7157B;fontSize=10;" edge="1" parent="1" source="apigw" target="analyzeLambda">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e5l" value="POST /analyze (sync)" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e5"><mxGeometry x="0.2" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#9A4E00;fontSize=10;dashed=1;" edge="1" parent="1" source="ingestLambda" target="ingestLambda">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="430" y="730" as="sourcePoint"/><mxPoint x="380" y="769" as="targetPoint"/><Array as="points"><mxPoint x="420" y="720"/></Array></mxGeometry>
+          <mxCell id="e6l" value="async self-invoke (Event)" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e6"><mxGeometry x="-0.3" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#232F3E;fontSize=10;dashed=1;" edge="1" parent="1" source="ingestTools" target="github">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e7l" value="scan_repo: GET tarball" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e7"><mxGeometry x="-0.2" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#7AA116;fontSize=10;" edge="1" parent="1" source="ingestLambda" target="s3">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e8l" value="PutObject — write KB (RW)" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e8"><mxGeometry x="-0.4" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#C925D1;fontSize=10;" edge="1" parent="1" source="ingestModes" target="ddbRepos">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e9l" value="record_status (RW)" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e9"><mxGeometry x="-0.2" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#DD344C;fontSize=10;dashed=1;" edge="1" parent="1" source="ingestTools" target="secrets">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e10l" value="GetSecretValue (opt)" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e10"><mxGeometry x="0.3" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#01A88D;fontSize=10;" edge="1" parent="1" source="ingestAgent" target="bedrock">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e11l" value="InvokeModel (orchestration)" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e11"><mxGeometry x="-0.2" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#C925D1;fontSize=10;" edge="1" parent="1" source="analyzeFlow" target="ddbResults">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e12l" value="cache get / put" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e12"><mxGeometry x="-0.2" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#7AA116;fontSize=10;" edge="1" parent="1" source="analyzeTools" target="s3">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e13l" value="GetObject — READ-ONLY KB" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e13"><mxGeometry x="0.3" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#C925D1;fontSize=10;dashed=1;" edge="1" parent="1" source="analyzeLambda" target="ddbRepos">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e14l" value="GetItem (409 readiness)" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e14"><mxGeometry x="0.2" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#01A88D;fontSize=10;" edge="1" parent="1" source="analyzeAgent" target="bedrock">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e15l" value="InvokeModel — 1 structured-output call" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e15"><mxGeometry x="0.1" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#E7157B;fontSize=10;dashed=1;" edge="1" parent="1" source="ingestLambda" target="cw">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e16l" value="logs" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e16"><mxGeometry x="0.4" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e17" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#E7157B;fontSize=10;dashed=1;" edge="1" parent="1" source="analyzeLambda" target="cw">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e17l" value="logs" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e17"><mxGeometry x="0.4" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e18" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#ED7100;fontSize=10;dashed=1;" edge="1" parent="1" source="ecrIngest" target="ingestLambda">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e18l" value="image_uri (content-hash tag)" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e18"><mxGeometry x="-0.2" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e19" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#ED7100;fontSize=10;dashed=1;" edge="1" parent="1" source="ecrAnalyze" target="analyzeLambda">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e19l" value="image_uri" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e19"><mxGeometry x="-0.2" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e20" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=open;strokeColor=#232F3E;fontSize=10;dashed=1;" edge="1" parent="1" source="tfnote" target="ecrIngest">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e20l" value="build / push / provision" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e20"><mxGeometry x="-0.2" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+        <mxCell id="e21" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#232F3E;fontSize=10;dashed=1;" edge="1" parent="1" source="ec2" target="apigw">
+          <mxGeometry relative="1" as="geometry" />
+          <mxCell id="e21l" value="config.json apiBaseUrl = API URL (set at deploy)" style="text;html=1;fontSize=9;" vertex="1" connectable="0" parent="e21"><mxGeometry x="-0.1" relative="1" as="geometry"/></mxCell>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

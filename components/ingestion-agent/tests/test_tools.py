@@ -15,6 +15,7 @@ import pytest
 from ingest_agent import workspace
 from ingest_agent.core import Config, slug
 from ingest_agent.tools import (
+    read_status_impl,
     record_status_impl,
     scan_source_impl,
     write_kb_file_impl,
@@ -53,6 +54,19 @@ def test_record_status_local_sink(run_ctx, tmp_path):
     status = json.loads((tmp_path / "out" / "acme__widgets__main" / "status.json").read_text())
     assert status["status"] == "READY"
     assert status["meta"] == {"n": 3}
+
+
+def test_read_status_missing_returns_none(run_ctx):
+    # Nothing recorded yet for this repo_id → no cache hit.
+    assert read_status_impl("acme__widgets__main") is None
+
+
+def test_read_status_round_trip(run_ctx):
+    record_status_impl("acme__widgets__main", "READY", {"n": 3})
+    record = read_status_impl("acme__widgets__main")
+    assert record is not None
+    assert record["status"] == "READY"
+    assert record["meta"] == {"n": 3}
 
 
 def test_finalize_copies_kb_tree(run_ctx, tmp_path):

@@ -70,6 +70,13 @@ def record_status_impl(repo_id: str, status: str, meta: Optional[dict] = None) -
     return f"status[{repo_id}] = {status}"
 
 
+def read_status_impl(repo_id: str) -> Optional[dict]:
+    """Return the stored status record for ``repo_id`` (or ``None`` if the repo
+    has never been ingested). Used to short-circuit a redundant re-ingest."""
+    ctx = workspace.current()
+    return ctx.sink.read_status(repo_id)
+
+
 def _github_token() -> Optional[str]:
     arn = os.environ.get("GITHUB_TOKEN_SECRET_ARN")
     if not arn:

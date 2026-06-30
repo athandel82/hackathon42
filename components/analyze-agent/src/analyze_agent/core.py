@@ -70,10 +70,18 @@ def run_analyze(repo_id: str, change_request: str,
     from .agent import build_agent
     from .models import ResultEnvelope
 
-    result = build_agent().structured_output(
-        ResultEnvelope,
+    # Use the supported invocation (structured_output_model=...) rather than the
+    # deprecated Agent.structured_output(): the latter forces tool_choice="any"
+    # in a single Converse turn, which the Claude 4.x reasoning models do not
+    # satisfy (ValueError "No valid tool use ..."). Passing the model into the
+    # invocation runs the normal agent loop and emits a schema-valid envelope.
+    agent_result = build_agent()(
         f'Change request for repo "{repo_id}": {change_request}',
+        structured_output_model=ResultEnvelope,
     )
-    out = result.model_dump()
+    envelope = agent_result.structured_output
+    if envelope is None:
+        raise ValueError("model did not return structured output")
+    out = envelope.model_dump()
     cache.put(repo_id, change_request, out)
     return out

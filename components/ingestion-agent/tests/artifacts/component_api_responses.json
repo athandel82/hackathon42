@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-30T11:36:58.341450+00:00",
+  "generated_at": "2026-06-30T13:21:17.307944+00:00",
   "repo": "https://github.com/patrikja/autosar@master",
   "repo_id": "patrikja__autosar__master",
   "note": "Bedrock LLM and AWS SDK stubbed; ARXML fetch+parse are real.",
@@ -10,20 +10,29 @@
       "meta": {
         "github_url": "https://github.com/patrikja/autosar",
         "branch": "master",
-        "location": "s3://component-test-bucket/patrikja__autosar__master/kb/"
+        "location": "s3://test-kb-bucket/patrikja__autosar__master/kb/"
       },
-      "updated_at": "2026-06-30T11:36:58.337495+00:00"
+      "updated_at": "2026-06-30T13:21:17.305021+00:00"
     }
   },
   "kb_files_uploaded": [
     "patrikja__autosar__master/kb/README.md",
+    "patrikja__autosar__master/kb/README.md",
+    "patrikja__autosar__master/kb/_index/components.md",
     "patrikja__autosar__master/kb/_index/components.md",
     "patrikja__autosar__master/kb/_index/path-index.md",
+    "patrikja__autosar__master/kb/_index/path-index.md",
+    "patrikja__autosar__master/kb/_index/source-map.md",
     "patrikja__autosar__master/kb/_index/source-map.md",
     "patrikja__autosar__master/kb/_index/stats.md",
+    "patrikja__autosar__master/kb/_index/stats.md",
+    "patrikja__autosar__master/kb/components/Door.md",
     "patrikja__autosar__master/kb/components/Door.md",
     "patrikja__autosar__master/kb/components/DoorControl.md",
+    "patrikja__autosar__master/kb/components/DoorControl.md",
     "patrikja__autosar__master/kb/components/EDC.md",
+    "patrikja__autosar__master/kb/components/EDC.md",
+    "patrikja__autosar__master/kb/components/IoHwAb.md",
     "patrikja__autosar__master/kb/components/IoHwAb.md"
   ],
   "api_cases": [
@@ -81,7 +90,7 @@
       "response": {
         "repo_id": "patrikja__autosar__master",
         "status": "READY",
-        "location": "s3://component-test-bucket/patrikja__autosar__master/kb/"
+        "location": "s3://test-kb-bucket/patrikja__autosar__master/kb/"
       }
     },
     {
@@ -103,7 +112,47 @@
         "headers": {
           "Content-Type": "application/json"
         },
-        "body": "{\"repo_id\": \"patrikja__autosar__master\", \"status\": \"READY\", \"meta\": {\"github_url\": \"https://github.com/patrikja/autosar\", \"branch\": \"master\", \"location\": \"s3://component-test-bucket/patrikja__autosar__master/kb/\"}}"
+        "body": "{\"repo_id\": \"patrikja__autosar__master\", \"status\": \"READY\", \"meta\": {\"github_url\": \"https://github.com/patrikja/autosar\", \"branch\": \"master\", \"location\": \"s3://test-kb-bucket/patrikja__autosar__master/kb/\"}}"
+      }
+    },
+    {
+      "case": "post_ingest_cached",
+      "description": "POST /ingest for an already-READY repo (cache hit)",
+      "request": {
+        "rawPath": "/ingest",
+        "requestContext": {
+          "http": {
+            "method": "POST"
+          }
+        },
+        "body": "{\"github_url\": \"https://github.com/patrikja/autosar\", \"branch\": \"master\"}"
+      },
+      "response": {
+        "statusCode": 202,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"repo_id\": \"patrikja__autosar__master\", \"status\": \"READY\", \"cached\": true, \"meta\": {\"github_url\": \"https://github.com/patrikja/autosar\", \"branch\": \"master\", \"location\": \"s3://test-kb-bucket/patrikja__autosar__master/kb/\"}}"
+      }
+    },
+    {
+      "case": "post_ingest_force",
+      "description": "POST /ingest with force=true (cache bypass)",
+      "request": {
+        "rawPath": "/ingest",
+        "requestContext": {
+          "http": {
+            "method": "POST"
+          }
+        },
+        "body": "{\"github_url\": \"https://github.com/patrikja/autosar\", \"branch\": \"master\", \"force\": true}"
+      },
+      "response": {
+        "statusCode": 202,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"repo_id\": \"patrikja__autosar__master\", \"status\": \"PENDING\"}"
       }
     },
     {

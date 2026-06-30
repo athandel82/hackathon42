@@ -1,0 +1,28 @@
+#!/bin/bash
+# user-data (ARCHITECTURE.md §4): build the React SPA, write runtime config.json
+# (apiBaseUrl = API Gateway URL, useStub:false), and serve dist/ on ${port}.
+set -euxo pipefail
+
+# --- toolchain ------------------------------------------------------------- #
+dnf install -y git nodejs npm
+
+# --- fetch the frontend source -------------------------------------------- #
+APP_ROOT=/opt/sdv
+rm -rf "$APP_ROOT"
+git clone --depth 1 ${frontend_repo_url} "$APP_ROOT"
+cd "$APP_ROOT/${frontend_subdir}"
+
+# --- runtime config (read by the SPA at startup) -------------------------- #
+# config.json lives in public/ so `vite build` copies it into dist/.
+cat > public/config.json <<CFG
+{
+  "apiBaseUrl": "${api_url}",
+  "useStub": false
+}
+CFG
+
+# --- build + serve via the component's start.sh (systemd, self-healing) ---- #
+# start.sh runs `npm install` + `npm run build`, then serves dist/ under a
+# systemd unit (Restart=always). PORT must match the reused security group.
+chmod +x ./start.sh
+PORT=${port} ./start.sh

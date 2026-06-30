@@ -41,6 +41,11 @@ class Sink(ABC):
     def write_status(self, repo_id: str, status: str, meta: dict) -> None: ...
 
     @abstractmethod
+    def read_status(self, repo_id: str) -> Optional[dict]:
+        """Return the stored status record for ``repo_id`` (or ``None`` if there
+        is no prior ingestion)."""
+
+    @abstractmethod
     def finalize(self, kb_dir: Path, repo_id: str) -> str:
         """Publish ``kb_dir`` and return a human-readable location string."""
 
@@ -63,6 +68,12 @@ class LocalSink(Sink):
             "updated_at": datetime.now(timezone.utc).isoformat(),
         }
         (d / "status.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+    def read_status(self, repo_id: str) -> Optional[dict]:
+        f = self.out_dir / repo_id / "status.json"
+        if not f.exists():
+            return None
+        return json.loads(f.read_text(encoding="utf-8"))
 
     def finalize(self, kb_dir: Path, repo_id: str) -> str:
         dest = self._repo_dir(repo_id) / "kb"
@@ -91,6 +102,10 @@ class AwsSink(Sink):
                 "updated_at": datetime.now(timezone.utc).isoformat(),
             }
         )
+
+    def read_status(self, repo_id: str) -> Optional[dict]:
+        item = self._ddb.get_item(Key={"repo_id": repo_id}).get("Item")
+        return dict(item) if item else None
 
     def finalize(self, kb_dir: Path, repo_id: str) -> str:
         kb_dir = Path(kb_dir)

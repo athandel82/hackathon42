@@ -15,10 +15,11 @@ from __future__ import annotations
 
 import json
 import os
+from decimal import Decimal
 from typing import Any
 
 from .core import Config, run_ingest, slug
-from .tools import record_status_impl
+from .tools import read_status_impl, record_status_impl
 from . import workspace
 
 
@@ -76,10 +77,33 @@ def _post_ingest(event: dict) -> dict:
     except (KeyError, ValueError):
         return _resp(400, {"error": "github_url is required"})
     branch = body.get("branch", "master")
+    force = bool(body.get("force", False))
     repo_id = slug(github_url, branch)
 
-    # Mark PENDING immediately so the frontend can start polling.
+    # Bind the per-run context so the status sink (DynamoDB in AWS mode) is
+    # available for both the cache lookup and the PENDING write below.
     Config.from_env().bind_run(repo_id)
+
+    # Idempotency / caching: a repo's KB lives at a deterministic prefix keyed by
+    # repo_id (github_url + branch), so re-submitting the same repo need not
+    # rebuild the index from scratch. Short-circuit unless the caller forces a
+    # refresh or the previous attempt failed.
+    if not force:
+        existing = read_status_impl(repo_id)
+        if existing is not None:
+            status = existing.get("status")
+            if status == "READY":
+                # KB already built — return it as-is; the frontend's status poll
+                # sees READY immediately and proceeds without a rebuild.
+                return _resp(202, {"repo_id": repo_id, "status": "READY",
+                                   "cached": True, "meta": existing.get("meta", {})})
+            if status == "PENDING":
+                # A build is already in flight — don't schedule a duplicate.
+                return _resp(202, {"repo_id": repo_id, "status": "PENDING",
+                                   "cached": True})
+            # status == FAILED (or anything else) → fall through and re-ingest.
+
+    # Mark PENDING immediately so the frontend can start polling.
     record_status_impl(repo_id, "PENDING", {"github_url": github_url, "branch": branch})
 
     _self_invoke({"mode": "worker", "github_url": github_url,
@@ -133,9 +157,23 @@ def _body(event: dict) -> dict:
     return json.loads(raw)
 
 
+def _json_default(o: Any) -> Any:
+    """Fallback encoder for ``json.dumps``.
+
+    DynamoDB returns all numbers as ``decimal.Decimal``, which the stdlib JSON
+    encoder cannot serialize — that previously made ``GET /status`` 500 whenever
+    a status ``meta`` carried a numeric value (e.g. element counts). Convert
+    Decimals to int/float and stringify anything else unexpected so a response
+    can never crash the handler.
+    """
+    if isinstance(o, Decimal):
+        return int(o) if o == o.to_integral_value() else float(o)
+    return str(o)
+
+
 def _resp(status: int, body: dict) -> dict:
     return {
         "statusCode": status,
-        "headers": _CORS,
-        "body": json.dumps(body),
+        "headers": {"Content-Type": "application/json"},
+        "body": json.dumps(body, default=_json_default),
     }

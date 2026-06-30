@@ -25,6 +25,7 @@ Run (no pytest needed)::
 from __future__ import annotations
 
 import json
+import os
 import sys
 import types
 from datetime import datetime, timezone
@@ -188,6 +189,12 @@ def _v2_event(method: str, path: str, body=None, query=None) -> dict:
 
 
 def main() -> int:
+    # Force AWS storage mode so the AwsSink / GET /status / cache-lookup paths run
+    # against the in-memory fake DynamoDB+S3 (see module docstring). Without these
+    # the component would fall back to the local-dir sink.
+    os.environ.setdefault("KB_BUCKET", "test-kb-bucket")
+    os.environ.setdefault("REPOS_TABLE", "test-repos-table")
+
     _install_fake_boto3()
 
     import ingest_agent.agent as agent_mod
@@ -239,6 +246,28 @@ def main() -> int:
     ev = _v2_event("GET", "/status", query={"repo_id": repo_id})
     resp = handler.handler(ev)
     record("get_status_ready", "GET /status after the worker finished", ev, resp)
+
+    # 4b) Re-submit the SAME repo -> cached READY, no rebuild scheduled.
+    workers_before = len(captured)
+    ev = _v2_event("POST", "/ingest", body={"github_url": GITHUB_URL, "branch": BRANCH})
+    resp = handler.handler(ev)
+    record("post_ingest_cached", "POST /ingest for an already-READY repo (cache hit)", ev, resp)
+    cached_body = json.loads(resp["body"])
+    assert cached_body["status"] == "READY", cached_body
+    assert cached_body.get("cached") is True, cached_body
+    assert len(captured) == workers_before, "cache hit must NOT schedule a new worker"
+
+    # 4c) Force re-ingest -> bypasses the cache and schedules a fresh worker.
+    ev = _v2_event("POST", "/ingest",
+                   body={"github_url": GITHUB_URL, "branch": BRANCH, "force": True})
+    resp = handler.handler(ev)
+    record("post_ingest_force", "POST /ingest with force=true (cache bypass)", ev, resp)
+    force_body = json.loads(resp["body"])
+    assert force_body["status"] == "PENDING", force_body
+    assert len(captured) == workers_before + 1, "force must schedule a new worker"
+
+    # Run the forced worker so the repo settles back to READY.
+    handler.handler(captured[-1])
 
     # 5) POST /ingest missing github_url -> 400.
     ev = _v2_event("POST", "/ingest", body={"branch": "master"})

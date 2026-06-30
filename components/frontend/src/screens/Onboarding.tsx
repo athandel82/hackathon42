@@ -12,11 +12,16 @@ import Alert from '@cloudscape-design/components/alert';
 import SpaceBetween from '@cloudscape-design/components/space-between';
 import Box from '@cloudscape-design/components/box';
 import Spinner from '@cloudscape-design/components/spinner';
+import ProgressBar from '@cloudscape-design/components/progress-bar';
 import type { ApiClient } from '../api/client';
 import { ApiError } from '../api/client';
 import type { RepoStatus } from '../api/types';
+import { INGEST_JOKES, nextRandomJokeIndex } from '../jokes';
 
 const POLL_INTERVAL_MS = 2000;
+const JOKE_INTERVAL_MS = 3000;
+const PROGRESS_TICK_MS = 700;
+const PROGRESS_CEILING = 93; // creep toward this while PENDING; snap to 100 on READY
 
 interface Props {
   client: ApiClient;
@@ -29,6 +34,10 @@ export function Onboarding({ client, onReady }: Props) {
   const [status, setStatus] = useState<RepoStatus | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [jokeIndex, setJokeIndex] = useState(() =>
+    Math.floor(Math.random() * INGEST_JOKES.length),
+  );
+  const [progress, setProgress] = useState(0);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearTimer = () => {
@@ -40,12 +49,37 @@ export function Onboarding({ client, onReady }: Props) {
 
   useEffect(() => clearTimer, []);
 
+  const pending = busy && status === 'PENDING';
+
+  // Rotate to a RANDOM joke while we wait on ingestion (never repeats back-to-back).
+  useEffect(() => {
+    if (!pending) return;
+    const id = setInterval(
+      () => setJokeIndex((i) => nextRandomJokeIndex(i)),
+      JOKE_INTERVAL_MS,
+    );
+    return () => clearInterval(id);
+  }, [pending]);
+
+  // Simulated progress: ease toward a ceiling while PENDING; snap to 100 on READY.
+  // The real signal is the /status poll — this just makes the wait feel alive.
+  useEffect(() => {
+    if (!pending) return;
+    const id = setInterval(() => {
+      setProgress((p) =>
+        p >= PROGRESS_CEILING ? PROGRESS_CEILING : p + Math.max(0.5, (PROGRESS_CEILING - p) * 0.06),
+      );
+    }, PROGRESS_TICK_MS);
+    return () => clearInterval(id);
+  }, [pending]);
+
   const poll = useCallback(
     async (id: string) => {
       try {
         const { status: s } = await client.status(id);
         setStatus(s);
         if (s === 'READY') {
+          setProgress(100);
           setBusy(false);
           onReady(id);
           return;
@@ -76,6 +110,8 @@ export function Onboarding({ client, onReady }: Props) {
     clearTimer();
     setError(null);
     setStatus(null);
+    setJokeIndex(Math.floor(Math.random() * INGEST_JOKES.length));
+    setProgress(0);
     setBusy(true);
     try {
       const { repo_id } = await client.ingest(githubUrl.trim());
@@ -121,9 +157,24 @@ export function Onboarding({ client, onReady }: Props) {
 
         {busy && status === 'PENDING' ? (
           <Box data-testid="onboarding-pending">
-            <SpaceBetween size="xs" direction="horizontal">
-              <Spinner />
-              <span>Ingesting{repoId ? ` ${repoId}` : ''}… this can take a moment.</span>
+            <SpaceBetween size="s">
+              <ProgressBar
+                value={Math.round(progress)}
+                label="Building the knowledge base"
+                description={repoId ? `Ingesting ${repoId}` : 'Ingesting repository'}
+                additionalInfo="Parsing ARXML, resolving ports, and mapping signal chains…"
+              />
+              <Box
+                data-testid="onboarding-pending-joke"
+                padding={{ vertical: 'xs', horizontal: 's' }}
+              >
+                <SpaceBetween size="xs" direction="horizontal">
+                  <Spinner />
+                  <span data-testid="onboarding-pending-message" style={{ fontStyle: 'italic' }}>
+                    {INGEST_JOKES[jokeIndex]}
+                  </span>
+                </SpaceBetween>
+              </Box>
             </SpaceBetween>
           </Box>
         ) : null}

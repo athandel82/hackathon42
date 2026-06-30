@@ -57,6 +57,40 @@ const jsonInit = (method: string, payload: unknown): RequestInit => ({
   body: JSON.stringify(payload),
 });
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+// `/analyze` runs the model synchronously, but API Gateway caps the integration
+// at 30s. A heavier change request can exceed that and return 503/504 — yet the
+// Lambda keeps running and CACHES its ResultEnvelope (keyed by repo_id +
+// change_request). So we transparently retry the same request: once the
+// background run finishes, a retry is a fast cache hit. This turns a gateway
+// timeout into a slightly longer, seamless wait instead of an error.
+//
+// Only gateway/transport failures are retried; deterministic outcomes (e.g. 409
+// not-ready, 4xx) propagate immediately.
+const ANALYZE_RETRYABLE_STATUS = new Set([502, 503, 504]);
+const ANALYZE_MAX_ATTEMPTS = 6;
+const ANALYZE_RETRY_DELAY_MS = 2500;
+
+async function analyzeWithRetry(
+  cfg: RuntimeConfig,
+  req: AnalyzeRequest,
+): Promise<ResultEnvelope> {
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= ANALYZE_MAX_ATTEMPTS; attempt++) {
+    try {
+      return await request<ResultEnvelope>(cfg, '/analyze', jsonInit('POST', req));
+    } catch (e) {
+      lastErr = e;
+      const retryable =
+        e instanceof ApiError ? ANALYZE_RETRYABLE_STATUS.has(e.status) : true; // network/transport error
+      if (!retryable || attempt === ANALYZE_MAX_ATTEMPTS) throw e;
+      await sleep(ANALYZE_RETRY_DELAY_MS);
+    }
+  }
+  throw lastErr;
+}
+
 export interface ApiClient {
   ingest(githubUrl: string): Promise<IngestResponse>;
   status(repoId: string): Promise<StatusResponse>;
@@ -74,6 +108,6 @@ export async function createClient(cfg?: RuntimeConfig): Promise<ApiClient> {
         `/status?repo_id=${encodeURIComponent(repoId)}`,
         { method: 'GET' },
       ),
-    analyze: (req) => request<ResultEnvelope>(resolved, '/analyze', jsonInit('POST', req)),
+    analyze: (req) => analyzeWithRetry(resolved, req),
   };
 }

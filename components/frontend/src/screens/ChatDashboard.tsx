@@ -6,6 +6,7 @@
 // and guard blocks are all surfaced per turn.
 
 import { useCallback, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import Container from '@cloudscape-design/components/container';
 import Header from '@cloudscape-design/components/header';
 import Form from '@cloudscape-design/components/form';
@@ -17,6 +18,7 @@ import Badge from '@cloudscape-design/components/badge';
 import SpaceBetween from '@cloudscape-design/components/space-between';
 import Box from '@cloudscape-design/components/box';
 import ColumnLayout from '@cloudscape-design/components/column-layout';
+import Spinner from '@cloudscape-design/components/spinner';
 import type { ApiClient } from '../api/client';
 import { ApiError } from '../api/client';
 import type { ResultEnvelope } from '../api/types';
@@ -131,20 +133,59 @@ export function ChatDashboard({ client, repoId, onReonboard }: Props) {
           ))}
         </SpaceBetween>
       )}
+
+      {busy ? (
+        <Box data-testid="analyze-loading">
+          <SpaceBetween size="xs" direction="horizontal">
+            <Spinner />
+            <span>Analyzing the change impact… complex requests can take up to a minute.</span>
+          </SpaceBetween>
+        </Box>
+      ) : null}
     </SpaceBetween>
   );
 }
 
 function UserBubble({ request }: { request: string }) {
   return (
-    <Box data-testid="user-message">
-      <SpaceBetween size="xxs">
-        <Badge color="blue">You</Badge>
-        <Box variant="p" fontWeight="bold">
+    <Box data-testid="user-message" textAlign="right">
+      <div
+        style={{
+          display: 'inline-block',
+          maxWidth: '80%',
+          textAlign: 'left',
+          background: '#0972d3',
+          color: '#ffffff',
+          padding: '8px 14px',
+          borderRadius: '14px 14px 3px 14px',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.15)',
+        }}
+      >
+        <div style={{ fontSize: '11px', fontWeight: 700, opacity: 0.85, marginBottom: '2px' }}>
+          You
+        </div>
+        <div style={{ fontWeight: 600, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
           {request}
-        </Box>
-      </SpaceBetween>
+        </div>
+      </div>
     </Box>
+  );
+}
+
+// Wraps every system reply (result/blocked/not-ready/error) so it reads clearly
+// as the assistant's turn — left-aligned, badged, and accented — in contrast to
+// the right-aligned blue user bubble.
+function AssistantResponse({ children }: { children: ReactNode }) {
+  return (
+    <div
+      data-testid="assistant-response"
+      style={{ borderLeft: '3px solid #037f0c', paddingLeft: '14px', marginLeft: '2px' }}
+    >
+      <SpaceBetween size="s">
+        <Badge color="green">🤖 SDV Analyzer</Badge>
+        {children}
+      </SpaceBetween>
+    </div>
   );
 }
 
@@ -153,41 +194,43 @@ function ConversationTurn({ turn, onReonboard }: { turn: Turn; onReonboard: () =
     <SpaceBetween size="s">
       <UserBubble request={turn.request} />
 
-      {turn.kind === 'result' ? <ResultReport result={turn.result} /> : null}
+      <AssistantResponse>
+        {turn.kind === 'result' ? <ResultReport result={turn.result} /> : null}
 
-      {turn.kind === 'blocked' ? (
-        <Alert type="warning" header="Request blocked by input guard" data-testid="guard-blocked">
-          <SpaceBetween size="xs">
-            <span>{turn.message}</span>
-            {turn.categories?.length ? (
-              <SpaceBetween size="xs" direction="horizontal">
-                {turn.categories.map((c) => (
-                  <Badge key={c} color="grey">
-                    {c}
-                  </Badge>
-                ))}
-              </SpaceBetween>
-            ) : null}
-          </SpaceBetween>
-        </Alert>
-      ) : null}
+        {turn.kind === 'blocked' ? (
+          <Alert type="warning" header="Request blocked by input guard" data-testid="guard-blocked">
+            <SpaceBetween size="xs">
+              <span>{turn.message}</span>
+              {turn.categories?.length ? (
+                <SpaceBetween size="xs" direction="horizontal">
+                  {turn.categories.map((c) => (
+                    <Badge key={c} color="grey">
+                      {c}
+                    </Badge>
+                  ))}
+                </SpaceBetween>
+              ) : null}
+            </SpaceBetween>
+          </Alert>
+        ) : null}
 
-      {turn.kind === 'not_ready' ? (
-        <Alert
-          type="warning"
-          header="Repository not ready"
-          data-testid="analyze-409"
-          action={<Button onClick={onReonboard}>Back to onboarding</Button>}
-        >
-          This repository is missing or not READY. Run onboarding first.
-        </Alert>
-      ) : null}
+        {turn.kind === 'not_ready' ? (
+          <Alert
+            type="warning"
+            header="Repository not ready"
+            data-testid="analyze-409"
+            action={<Button onClick={onReonboard}>Back to onboarding</Button>}
+          >
+            This repository is missing or not READY. Run onboarding first.
+          </Alert>
+        ) : null}
 
-      {turn.kind === 'error' ? (
-        <Alert type="error" header="Analysis error" data-testid="analyze-error">
-          {turn.message}
-        </Alert>
-      ) : null}
+        {turn.kind === 'error' ? (
+          <Alert type="error" header="Analysis error" data-testid="analyze-error">
+            {turn.message}
+          </Alert>
+        ) : null}
+      </AssistantResponse>
     </SpaceBetween>
   );
 }
