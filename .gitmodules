@@ -1,0 +1,3 @@
+[submodule "knowledge_base/input/autosar"]
+	path = knowledge_base/input/autosar
+	url = https://github.com/patrikja/autosar
