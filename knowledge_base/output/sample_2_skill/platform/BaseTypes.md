@@ -7,7 +7,7 @@
 | Package | /ArcCore/Platform/BaseTypes |
 | Category | BLUEPRINT |
 | Source File | ArcCore_Types.arxml |
-| AUTOSAR Schema | R4.0 |
+| AUTOSAR Schema | R4.0 (autosar_4-0-3.xsd) |
 
 ## Description
 

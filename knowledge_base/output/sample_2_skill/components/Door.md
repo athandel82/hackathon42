@@ -20,8 +20,8 @@ Application software component representing a single physical door. Provides doo
 
 | Port Name | Interface | Interface Type | UUID |
 |-----------|-----------|----------------|------|
-| Status | /Demo/Interfaces/DoorStatus | SENDER-RECEIVER-INTERFACE | 9dc49b58-a185-36d4-8594-1e564711dd28 |
 | Command | /Demo/Interfaces/DoorCommands | CLIENT-SERVER-INTERFACE | 48d04d5b-cf28-3086-80a1-8712384b653f |
+| Status | /Demo/Interfaces/DoorStatus | SENDER-RECEIVER-INTERFACE | 9dc49b58-a185-36d4-8594-1e564711dd28 |
 
 ### Required Ports (R-PORT)
 
@@ -40,8 +40,8 @@ _None_
 
 | Event Name | Type | Trigger | Period | UUID |
 |------------|------|---------|--------|------|
-| timingEvent_0_1 | TIMING-EVENT | DoorMain | 0.1s | 57cbf43a-2a8f-4509-91d8-c1a559dc4aa6 |
 | Command_SetLock | OPERATION-INVOKED-EVENT | SetLocked (via Command/SetLock) | — | 7b360f21-6683-466d-b140-1c575170e137 |
+| timingEvent_0_1 | TIMING-EVENT | DoorMain | 0.1s | 57cbf43a-2a8f-4509-91d8-c1a559dc4aa6 |
 
 ## Runnables
 

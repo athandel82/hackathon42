@@ -72,9 +72,9 @@ _None_
 
 | Type Name | Category | Base Type Reference | UUID |
 |-----------|----------|---------------------|------|
-| DigitalLevel | TYPE_REFERENCE | /ArcCore/Platform/ImplementationDataTypes/uint8 | db4b6add-7698-3ee4-9dae-adaa7488c81a |
+| DigitalLevel | TYPE_REFERENCE | /ArcCore/Platform/ImplementationDataTypes/uint8 | ce7d4658-6239-3091-8e78-7747c6a4fdfd |
 | IoHwAb_SignalType_ | TYPE_REFERENCE | /ArcCore/Platform/ImplementationDataTypes/uint32 | 6e499ceb-e086-39a3-a8aa-cad156c2235d |
-| SignalQuality | TYPE_REFERENCE | /ArcCore/Platform/ImplementationDataTypes/uint8 | ce7d4658-6239-3091-8e78-7747c6a4fdfd |
+| SignalQuality | TYPE_REFERENCE | /ArcCore/Platform/ImplementationDataTypes/uint8 | db4b6add-7698-3ee4-9dae-adaa7488c81a |
 
 ## Enumerations
 
